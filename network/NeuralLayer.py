@@ -1,10 +1,10 @@
+from network.Neuron import Neuron
+
 class NeuralLayer:
     
-    def __init__(neuronCount: int, func: Callable):
+    def __init__(self, neuronCount, func):
         self.func = func
-        self.neurons = []
-        for i in range(neuronCount):
-            neurons.append(Neuron(func))
+        self.neurons = [ Neuron(func) for i in range(0,neuronCount) ]
             
     def process(inputs) -> []:
         
