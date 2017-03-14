@@ -2,12 +2,12 @@ import math
 
 EPSILON = 0.0001
 
-def convolution(inputs, weights):
-    assert len(inputs) == len(weights)
+def convolution(inputs, feature):
+    assert len(inputs) == len(feature)
 
     numPixels = len(inputs)
     for i in range(numPixels):
-        sum += inputs[i] * weights[i]
+        sum += inputs[i] * feature[i]
 
     return sum / numPixels
 
