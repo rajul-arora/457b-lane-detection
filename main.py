@@ -48,8 +48,8 @@ def pool(input):
 
         outputRow = []
         for j in range(0, len(input[0]), stride):            
-            max = max(inputs, windowSize, i, j)
-            outputRow.append(max)        
+            maxVal = max(input, windowSize, i, j)
+            outputRow.append(maxVal)        
 
         output.append(outputRow)
     
@@ -58,8 +58,10 @@ def pool(input):
 def max(inputs, windowSize, xOffset, yOffset):
 
     res = inputs[xOffset][yOffset]
-    for i in range(xOffset, windowSize + xOffset):
-        for j in range(yOffset, windowSize + yOffset):
+    inputRowLen = len(inputs)
+    inputColLen = len(inputs[0])
+    for i in range(xOffset, min(windowSize + xOffset, inputRowLen)):
+        for j in range(yOffset, min(windowSize + yOffset, inputColLen)):
             if inputs[i][j] > res:
                 res = inputs[i][j]
     
@@ -80,11 +82,11 @@ def emptyFunction(inputs):
 def main():
 
     inputMatrix = [
-        [1,1,1,1,1],
-        [1,1,1,1,1],
-        [1,1,1,1,1],
-        [1,1,1,1,1],
-        [1,1,1,1,1],
+        [1,0.2,1,0.3,1],
+        [0.1,0.4,1,0.5,1],
+        [0.2,0.6,0.9,0.7,1],
+        [0.3,0.8,0.8,0.9,1],
+        [0.4,0.9,0.7,0.99,1],
     ]
 
     featureMatrix = [
@@ -92,7 +94,7 @@ def main():
         [0,1],
     ]
     
-    output = convolution(inputMatrix, featureMatrix)
+    output = pool(inputMatrix)
 
     for i in range(len(output)):
         print(output[i])
