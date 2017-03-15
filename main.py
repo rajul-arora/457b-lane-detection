@@ -95,9 +95,14 @@ def main():
     ]
     
     output = pool(inputMatrix)
+    convOutput = convolution(inputMatrix, featureMatrix)
 
     for i in range(len(output)):
         print(output[i])
+
+    for i in range(len(convOutput)):
+        print(convOutput[i])
+
 
     # numbeOfPixels = 32
 
