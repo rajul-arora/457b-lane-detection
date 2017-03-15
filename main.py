@@ -58,8 +58,8 @@ def pool(input):
 def max(input, windowSize, xOffset, yOffset):
 
     res = input[xOffset][yOffset]
-    inputRowLen = len(inputs)
-    inputColLen = len(inputs[0])
+    inputRowLen = len(input)
+    inputColLen = len(input[0])
     for i in range(xOffset, min(windowSize + xOffset, inputRowLen)):
         for j in range(yOffset, min(windowSize + yOffset, inputColLen)):
             if input[i][j] > res:
@@ -118,7 +118,7 @@ def testPooling():
         [0.4,0.9,0.7,0.99,1],
     ]
 
-    output = pooling(inputMatrix)
+    output = pool(inputMatrix)
 
     for i in range(len(output)):
         print(output[i])
