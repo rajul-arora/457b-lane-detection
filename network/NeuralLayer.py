@@ -6,7 +6,7 @@ class NeuralLayer:
         self.func = func
         self.neurons = [ Neuron(func) for i in range(0,neuronCount) ]
             
-    def process(inputs) -> []:
+    def process(inputs, weights) -> []:
         
         outputs = []
         for neuron in self.neurons:
