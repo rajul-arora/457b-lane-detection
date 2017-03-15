@@ -6,30 +6,19 @@ from network.Network import Network
 EPSILON = 0.0001
 
 def convolution(input, feature):
-    
-    numPixelsInFeature = len(feature) * len(feature[0])
-    numColMovements = len(input) - len(feature)
-    numRowMovements = len(input[0]) - len(feature[0])
+    output = [[0 for x in range(len(input) - len(feature) + 1)] for y in range(len(input[0]) - len(feature[0]) + 1)]
+    denom = len(feature) * len(feature[0])
 
-    output = []
-    # Loop over the outer input marix
-    for i in range(numRowMovements):
-        for j in range(numColMovements):
+    for i in range(len(input) - len(feature) + 1):
+        for j in range(len(input[0]) - len(feature[0]) + 1):
             sum = 0
-            # Loop over the freature matrix
             for x in range(len(feature)):
                 for y in range(len(feature[0])):
-                    sum += input[y + j][x + i] * feature[x][y]
-            
-            result = sum / numPixelsInFeature
+                    sum += input[x+j][y+j] * feature[x][y]
 
+            output[i][j] = sum / denom
 
-    sum = 0
-    numPixels = len(inputs)
-    for i in range(numPixels):
-        sum += inputs[i] * feature[i]
-
-    return sum / numPixels
+    return output
 
 def sigmoid(input):
     """
@@ -54,16 +43,34 @@ def emptyFunction(inputs):
 
 def main():
 
-    numbeOfPixels = 32
+    inputMatrix = [
+        [1,1,1,1,1],
+        [1,1,1,1,1],
+        [1,1,1,1,1],
+        [1,1,1,1,1],
+        [1,1,1,1,1],
+    ]
 
-    inputLayer = NeuralLayer(numbeOfPixels, emptyFunction)
-    convLayer = NeuralLayer(1, convolution)
-    activLayer = NeuralLayer(1, sigmoid)
-    poolLayer = NeuralLayer(1, pool)
-    fullyConnectedLayer = NeuralLayer(1, emptyFunction)
+    featureMatrix = [
+        [1,0],
+        [0,1],
+    ]
+    
+    output = convolution(inputMatrix, featureMatrix)
 
-    layers = [inputLayer, convLayer, activLayer, poolLayer, fullyConnectedLayer]
-    network = Network(16, layers)
+    for i in range(len(output)):
+        print(output[i])
+
+    # numbeOfPixels = 32
+
+    # inputLayer = NeuralLayer(numbeOfPixels, emptyFunction)
+    # convLayer = NeuralLayer(1, convolution)
+    # activLayer = NeuralLayer(1, sigmoid)
+    # poolLayer = NeuralLayer(1, pool)
+    # fullyConnectedLayer = NeuralLayer(1, emptyFunction)
+
+    # layers = [inputLayer, convLayer, activLayer, poolLayer, fullyConnectedLayer]
+    # network = Network(16, layers)
 
 if __name__ == '__main__':
     main()
