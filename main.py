@@ -55,29 +55,40 @@ def pool(input):
     
     return output
 
-def max(inputs, windowSize, xOffset, yOffset):
+def max(input, windowSize, xOffset, yOffset):
 
-    res = inputs[xOffset][yOffset]
+    res = input[xOffset][yOffset]
     inputRowLen = len(inputs)
     inputColLen = len(inputs[0])
     for i in range(xOffset, min(windowSize + xOffset, inputRowLen)):
         for j in range(yOffset, min(windowSize + yOffset, inputColLen)):
-            if inputs[i][j] > res:
-                res = inputs[i][j]
+            if input[i][j] > res:
+                res = input[i][j]
     
     return res
 
-def avg(inputs, windowSize, xOffset, yOffset):
+def avg(input, windowSize, xOffset, yOffset):
     
     res = 0
     for i in range(xOffset, windowSize + xOffset):
         for j in range(yOffset, windowSize + yOffset):
-            res += inputs[i][j]
+            res += input[i][j]
     
     return res / (windowSize * windowSize)
 
-def emptyFunction(inputs):
-    return inputs
+def emptyFunction(input):
+    return input
+
+def fullyConnectedFunction(inputs):
+    """
+    Takes an array 2d arrays and smushes their entries together into a 1d array
+    """
+    vector = []
+    for input in inputs:
+        for i in range(len(input)):
+            for j in range(len(input[i])):
+                vector.append(input[i][j])
+    return vector
 
 def testConvolution():
     inputMatrix = [
@@ -114,19 +125,19 @@ def testPooling():
 
 def main():
 
-    # testConvolution()
-    # testPooling()
+    testConvolution()
+    testPooling()
 
-    numbeOfPixels = 32
+    # numbeOfPixels = 32
 
-    inputLayer = NeuralLayer(numbeOfPixels, emptyFunction)
-    convLayer = NeuralLayer(1, convolution)
-    activLayer = NeuralLayer(1, sigmoid)
-    poolLayer = NeuralLayer(1, pool)
-    fullyConnectedLayer = NeuralLayer(1, emptyFunction)
+    # inputLayer = NeuralLayer(numbeOfPixels, emptyFunction)
+    # convLayer = NeuralLayer(1, convolution)
+    # activLayer = NeuralLayer(1, sigmoid)
+    # poolLayer = NeuralLayer(1, pool)
+    # fullyConnectedLayer = NeuralLayer(1, emptyFunction)
 
-    layers = [inputLayer, convLayer, activLayer, poolLayer, fullyConnectedLayer]
-    network = Network(layers)
+    # layers = [inputLayer, convLayer, activLayer, poolLayer, fullyConnectedLayer]
+    # network = Network(layers)
 
 if __name__ == '__main__':
     main()
