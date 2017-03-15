@@ -138,20 +138,20 @@ def testFullyConnected():
 
 def main():
 
-    testConvolution()
-    testPooling()
-    testFullyConnected()
+    # testConvolution()
+    # testPooling()
+    # testFullyConnected()
 
-    # numbeOfPixels = 32
+    numbeOfPixels = 3 * 3 * 3
 
-    # inputLayer = NeuralLayer(numbeOfPixels, emptyFunction)
-    # convLayer = NeuralLayer(1, convolution)
-    # activLayer = NeuralLayer(1, sigmoid)
-    # poolLayer = NeuralLayer(1, pool)
-    # fullyConnectedLayer = NeuralLayer(1, emptyFunction)
+    inputLayer = NeuralLayer(numbeOfPixels, emptyFunction)
+    convLayer = NeuralLayer(1, convolution, True)
+    activLayer = NeuralLayer(1, sigmoid)
+    poolLayer = NeuralLayer(1, pool)
+    fullyConnectedLayer = NeuralLayer(1, emptyFunction)
 
-    # layers = [inputLayer, convLayer, activLayer, poolLayer, fullyConnectedLayer]
-    # network = Network(layers)
+    layers = [inputLayer, convLayer, activLayer, poolLayer, fullyConnectedLayer]
+    network = Network(layers)
 
 if __name__ == '__main__':
     main()
