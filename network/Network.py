@@ -1,6 +1,5 @@
 class Network:
-    def __init__(self, numNeurons, layers):
-        self.numNeurons = numNeurons
+    def __init__(self, layers):
         self.layers = layers
     
     def train(inputs):

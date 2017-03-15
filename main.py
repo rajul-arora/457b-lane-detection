@@ -79,8 +79,26 @@ def avg(inputs, windowSize, xOffset, yOffset):
 def emptyFunction(inputs):
     return inputs
 
-def main():
+def testConvolution():
+    inputMatrix = [
+        [1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1],
+    ]
 
+    featureMatrix = [
+        [1,0],
+        [0,1],
+    ]
+
+    convOutput = convolution(inputMatrix, featureMatrix)
+
+    for i in range(len(convOutput)):
+        print(convOutput[i])
+
+def testPooling():
     inputMatrix = [
         [1,0.2,1,0.3,1],
         [0.1,0.4,1,0.5,1],
@@ -89,31 +107,26 @@ def main():
         [0.4,0.9,0.7,0.99,1],
     ]
 
-    featureMatrix = [
-        [1,0],
-        [0,1],
-    ]
-    
-    output = pool(inputMatrix)
-    convOutput = convolution(inputMatrix, featureMatrix)
+    output = pooling(inputMatrix)
 
     for i in range(len(output)):
         print(output[i])
 
-    for i in range(len(convOutput)):
-        print(convOutput[i])
+def main():
 
+    # testConvolution()
+    # testPooling()
 
-    # numbeOfPixels = 32
+    numbeOfPixels = 32
 
-    # inputLayer = NeuralLayer(numbeOfPixels, emptyFunction)
-    # convLayer = NeuralLayer(1, convolution)
-    # activLayer = NeuralLayer(1, sigmoid)
-    # poolLayer = NeuralLayer(1, pool)
-    # fullyConnectedLayer = NeuralLayer(1, emptyFunction)
+    inputLayer = NeuralLayer(numbeOfPixels, emptyFunction)
+    convLayer = NeuralLayer(1, convolution)
+    activLayer = NeuralLayer(1, sigmoid)
+    poolLayer = NeuralLayer(1, pool)
+    fullyConnectedLayer = NeuralLayer(1, emptyFunction)
 
-    # layers = [inputLayer, convLayer, activLayer, poolLayer, fullyConnectedLayer]
-    # network = Network(16, layers)
+    layers = [inputLayer, convLayer, activLayer, poolLayer, fullyConnectedLayer]
+    network = Network(layers)
 
 if __name__ == '__main__':
     main()
