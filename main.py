@@ -123,10 +123,24 @@ def testPooling():
     for i in range(len(output)):
         print(output[i])
 
+def testFullyConnected():
+    m1 = [
+        [1,2],
+        [3,4]
+    ]
+
+    m2 = [
+        [5,6],
+        [7,8]
+    ]
+
+    print(fullyConnectedFunction([m1,m2]))
+
 def main():
 
     testConvolution()
     testPooling()
+    testFullyConnected()
 
     # numbeOfPixels = 32
 
