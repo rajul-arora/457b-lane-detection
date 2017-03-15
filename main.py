@@ -35,8 +35,44 @@ def sigmoid(input):
 
     return output
 
-def pool():
-    pass
+def pool(input):
+    """
+    Performs pooling on the input matrix and returns a smaller matrix
+    """
+
+    windowSize = 2
+    stride = 2
+
+    output = []
+    for i in range(0, len(input), stride):
+
+        outputRow = []
+        for j in range(0, len(input[0]), stride):            
+            max = max(inputs, windowSize, i, j)
+            outputRow.append(max)        
+
+        output.append(outputRow)
+    
+    return output
+
+def max(inputs, windowSize, xOffset, yOffset):
+
+    res = inputs[xOffset][yOffset]
+    for i in range(xOffset, windowSize + xOffset):
+        for j in range(yOffset, windowSize + yOffset):
+            if inputs[i][j] > res:
+                res = inputs[i][j]
+    
+    return res
+
+def avg(inputs, windowSize, xOffset, yOffset):
+    
+    res = 0
+    for i in range(xOffset, windowSize + xOffset):
+        for j in range(yOffset, windowSize + yOffset):
+            res += inputs[i][j]
+    
+    return res / (windowSize * windowSize)
 
 def emptyFunction(inputs):
     return inputs
