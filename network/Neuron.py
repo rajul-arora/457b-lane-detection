@@ -1,8 +1,10 @@
 class Neuron:
 
-    def __init__(self, func, hasWeights = False):
+    def __init__(self, func):
         self.func = func
-        self.weights = hasWeights ? [] : None
 
-    def process(inputs):
-        self.func(inputs, self.weights)
+    def process(self, inputs):
+        self.callFunc(inputs)
+
+    def callFunc(self, inputs):
+        self.func(inputs)

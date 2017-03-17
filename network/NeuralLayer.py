@@ -2,9 +2,12 @@ from network.Neuron import Neuron
 
 class NeuralLayer:
     
-    def __init__(self, neuronCount, func, hasWeights = False):
-        self.neurons = [ Neuron(func, hasWeights) for i in range(0,neuronCount) ]
-            
+    def __init__(self, nueronCount, func):
+        self.neurons = [ self.createNueron(func) for i in range(0, nueronCount) ]
+    
+    def createNueron(self, func):
+        return Neuron(func)
+
     def process(inputs) -> []:
         assert len(inputs) == len(self.neurons)
 

@@ -1,24 +1,29 @@
 import math
 from network.Neuron import Neuron
 from network.NeuralLayer import NeuralLayer
+from network.ConvolutionLayer import ConvolutionLayer
 from network.Network import Network
 
 EPSILON = 0.0001
 
-def convolution(input, feature):
-    output = [[0 for x in range(len(input) - len(feature) + 1)] for y in range(len(input[0]) - len(feature[0]) + 1)]
-    denom = len(feature) * len(feature[0])
+# def convolution(input, feature):
+#     """
+#     Convolves the input matrix with the given feature matrix.
+#     Returns the convolution as an output matrix (smaller in size from input)
+#     """
+#     output = [[0 for x in range(len(input) - len(feature) + 1)] for y in range(len(input[0]) - len(feature[0]) + 1)]
+#     denom = len(feature) * len(feature[0])
 
-    for i in range(len(input) - len(feature) + 1):
-        for j in range(len(input[0]) - len(feature[0]) + 1):
-            sum = 0
-            for x in range(len(feature)):
-                for y in range(len(feature[0])):
-                    sum += input[x+j][y+j] * feature[x][y]
+#     for i in range(len(input) - len(feature) + 1):
+#         for j in range(len(input[0]) - len(feature[0]) + 1):
+#             sum = 0
+#             for x in range(len(feature)):
+#                 for y in range(len(feature[0])):
+#                     sum += input[x+j][y+j] * feature[x][y]
 
-            output[i][j] = sum / denom
+#             output[i][j] = sum / denom
 
-    return output
+#     return output
 
 def sigmoid(input):
     """
@@ -145,10 +150,10 @@ def main():
     numbeOfPixels = 3 * 3 * 3
 
     inputLayer = NeuralLayer(numbeOfPixels, emptyFunction)
-    convLayer = NeuralLayer(1, convolution, True)
+    convLayer = ConvolutionLayer(1)
     activLayer = NeuralLayer(1, sigmoid)
     poolLayer = NeuralLayer(1, pool)
-    fullyConnectedLayer = NeuralLayer(1, emptyFunction)
+    fullyConnectedLayer = NeuralLayer(1, fullyConnectedFunction)
 
     layers = [inputLayer, convLayer, activLayer, poolLayer, fullyConnectedLayer]
     network = Network(layers)
