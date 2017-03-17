@@ -7,8 +7,8 @@ class WeightedNeuron(Neuron):
         super(WeightedNeuron, self).__init__(func)
         self.weights = weights if (weights != None) else self.generateWeights(weightsDim)
 
-    def callFunc(self, inputs):
-        self.func(inputs, self.weights)
+    def callFunc(self, input):
+        self.func(input, self.weights)
 
     def generateWeights(self, weightsDim):
         width = weightsDim[0]
@@ -20,6 +20,9 @@ class WeightedNeuron(Neuron):
                 output[i][j] = random.uniform(0, 1)
 
         return output
+
+    def adjustWeights(self, prevInput, error):
+        self.weights = adeline(prevInput, error, weights)        
 
 class ConvolutionLayer(NeuralLayer):
     
@@ -69,11 +72,39 @@ class FullyConnectedLayer(NeuralLayer):
     @staticmethod
     def combine(inputs):
         """
-        Takes an array 2d arrays and smushes their entries together into a 1d array
+        Takes a list of 2d arrays and smushes their entries together into a 2d array
+        Each row is each input as a a 1d array
         """
-        vector = []
+        output = []
         for input in inputs:
+
+            vector = []
             for i in range(len(input)):
                 for j in range(len(input[i])):
                     vector.append(input[i][j])
-        return vector
+
+            output.append(vector)
+
+        return output
+
+class OutputLayer(FullyConnectedLayer):
+    
+    def __init__(self, neuronCount):
+        super(OutputLayer, self).__init__(neuronCount, self.vote)
+            
+    def createNueron(self, func):
+        return WeightedNeuron(func)
+
+    @staticmethod
+    def vote(input, weights):
+        """
+        Uses the input matrix and weights to vote
+        """
+        
+        denom = len(weights) * len(weights[0])
+        sum = 0
+        for x in range(len(weights)):
+            for y in range(len(weights[0])):
+                sum += input[x][y] * weights[x][y]
+
+        return sum / denom

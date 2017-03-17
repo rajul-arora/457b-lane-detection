@@ -8,6 +8,10 @@ class NeuralLayer:
     def createNueron(self, func):
         return Neuron(func)
 
+    def setError(self, error):
+        for neuron in self.neurons:
+            neuron.setError(error)
+
     def process(self, inputs):
         """
         Passes the inputs to their corresponding nueron.
