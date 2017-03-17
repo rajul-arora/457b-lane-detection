@@ -2,9 +2,9 @@ from network.Neuron import Neuron
 from network.NeuralLayer import NeuralLayer
 import random
 
-class ConvNeuron(Neuron):
+class WeightedNeuron(Neuron):
     def __init__(self, func, weights = None, weightsDim = [3, 3]):
-        super(ConvNeuron, self).__init__(func)
+        super(WeightedNeuron, self).__init__(func)
         self.weights = weights if (weights != None) else self.generateWeights(weightsDim)
 
     def callFunc(self, inputs):
@@ -23,11 +23,11 @@ class ConvNeuron(Neuron):
 
 class ConvolutionLayer(NeuralLayer):
     
-    def __init__(self, nueronCount):
-        super(ConvolutionLayer, self).__init__(nueronCount, self.convolve)
+    def __init__(self, neuronCount):
+        super(ConvolutionLayer, self).__init__(neuronCount, self.convolve)
             
     def createNueron(self, func):
-        return ConvNeuron(func)
+        return WeightedNeuron(func)
 
     @staticmethod
     def convolve(input, feature):
@@ -48,3 +48,32 @@ class ConvolutionLayer(NeuralLayer):
                 output[i][j] = sum / denom
 
         return output
+
+class FullyConnectedLayer(NeuralLayer):
+    
+    def __init__(self, neuronCount):
+        super(FullyConnectedLayer, self).__init__(neuronCount, self.combine)
+
+    def process(self, inputs):
+        """
+        Passes the inputs to all nuerons.
+        """
+        outputs = []
+        for neuron in self.neurons:
+            # Process each neuron with all the inputs
+            result = neuron.process(inputs)
+            outputs.append(result)
+        
+        return outputs
+
+    @staticmethod
+    def combine(inputs):
+        """
+        Takes an array 2d arrays and smushes their entries together into a 1d array
+        """
+        vector = []
+        for input in inputs:
+            for i in range(len(input)):
+                for j in range(len(input[i])):
+                    vector.append(input[i][j])
+        return vector

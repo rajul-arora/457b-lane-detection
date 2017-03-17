@@ -1,7 +1,8 @@
 import math
 from network.Neuron import Neuron
 from network.NeuralLayer import NeuralLayer
-from network.ConvolutionLayer import ConvolutionLayer
+from network.CustomLayers import ConvolutionLayer
+from network.CustomLayers import FullyConnectedLayer
 from network.Network import Network
 
 EPSILON = 0.0001
@@ -81,19 +82,19 @@ def avg(input, windowSize, xOffset, yOffset):
     
     return res / (windowSize * windowSize)
 
-def emptyFunction(input):
-    return input
+# def emptyFunction(input):
+#     return input
 
-def fullyConnectedFunction(inputs):
-    """
-    Takes an array 2d arrays and smushes their entries together into a 1d array
-    """
-    vector = []
-    for input in inputs:
-        for i in range(len(input)):
-            for j in range(len(input[i])):
-                vector.append(input[i][j])
-    return vector
+# def fullyConnectedFunction(inputs):
+#     """
+#     Takes an array 2d arrays and smushes their entries together into a 1d array
+#     """
+#     vector = []
+#     for input in inputs:
+#         for i in range(len(input)):
+#             for j in range(len(input[i])):
+#                 vector.append(input[i][j])
+#     return vector
 
 def testConvolution():
     inputMatrix = [
@@ -149,13 +150,14 @@ def main():
 
     numbeOfPixels = 3 * 3 * 3
 
-    inputLayer = NeuralLayer(numbeOfPixels, emptyFunction)
+    # inputLayer = NeuralLayer(numbeOfPixels, emptyFunction)
     convLayer = ConvolutionLayer(1)
     activLayer = NeuralLayer(1, sigmoid)
     poolLayer = NeuralLayer(1, pool)
-    fullyConnectedLayer = NeuralLayer(1, fullyConnectedFunction)
+    fullyConnectedLayer = FullyConnectedLayer(1)
 
-    layers = [inputLayer, convLayer, activLayer, poolLayer, fullyConnectedLayer]
+    # layers = [inputLayer, convLayer, activLayer, poolLayer, fullyConnectedLayer]
+    layers = [convLayer, activLayer, poolLayer, fullyConnectedLayer]
     network = Network(layers)
 
 if __name__ == '__main__':
