@@ -2,41 +2,8 @@ import math
 from network.Neuron import Neuron
 from network.NeuralLayer import NeuralLayer
 from network.CustomLayers import ConvolutionLayer
-from network.CustomLayers import FullyConnectedLayer
 from network.Network import Network
-
-EPSILON = 0.0001
-LEARNING_RATE = 0.1
-
-# def convolution(input, feature):
-#     """
-#     Convolves the input matrix with the given feature matrix.
-#     Returns the convolution as an output matrix (smaller in size from input)
-#     """
-#     output = [[0 for x in range(len(input) - len(feature) + 1)] for y in range(len(input[0]) - len(feature[0]) + 1)]
-#     denom = len(feature) * len(feature[0])
-
-#     for i in range(len(input) - len(feature) + 1):
-#         for j in range(len(input[0]) - len(feature[0]) + 1):
-#             sum = 0
-#             for x in range(len(feature)):
-#                 for y in range(len(feature[0])):
-#                     sum += input[x+j][y+j] * feature[x][y]
-
-#             output[i][j] = sum / denom
-
-#     return output
-
-def adeline(input, error, weights):
-    """
-    Performs adeline to get the next set of weights
-    """
-    output = [[0 for x in range(len(weights))] for y in range(len(weights[0]))]
-    for i in range(len(weights)):
-        for j in range(len(weights[0])):
-            output[i][j] = weights[i][j] + LEARNING_RATE * error * input[i][j]
-
-    return output
+import network.constants
 
 def sigmoid(input):
     """
@@ -44,7 +11,7 @@ def sigmoid(input):
     """
 
     # Instantiate output as a matrix same dimensions as input
-    output = [ [0 for i in range(len(input))] for j in range(len(inputs[0])) ] 
+    output = [ [0 for i in range(len(input))] for j in range(len(input[0])) ] 
 
     # Perform sigmoid on all elements in input matrix
     for x in range(len(input)):
@@ -93,20 +60,6 @@ def avg(input, windowSize, xOffset, yOffset):
             res += input[i][j]
     
     return res / (windowSize * windowSize)
-
-# def emptyFunction(input):
-#     return input
-
-# def fullyConnectedFunction(inputs):
-#     """
-#     Takes an array 2d arrays and smushes their entries together into a 1d array
-#     """
-#     vector = []
-#     for input in inputs:
-#         for i in range(len(input)):
-#             for j in range(len(input[i])):
-#                 vector.append(input[i][j])
-#     return vector
 
 def testConvolution():
     inputMatrix = [
@@ -160,17 +113,17 @@ def main():
     # testPooling()
     # testFullyConnected()
 
-    numbeOfPixels = 3 * 3 * 3
+    input = [[0 for x in range(16) ] for y in range(16)]
+    for i in range(16):
+        input[i][i] = 1
 
-    # inputLayer = NeuralLayer(numbeOfPixels, emptyFunction)
-    convLayer = ConvolutionLayer(1)
-    activLayer = NeuralLayer(1, sigmoid)
-    poolLayer = NeuralLayer(1, pool)
-    fullyConnectedLayer = FullyConnectedLayer(1)
-
-    # layers = [inputLayer, convLayer, activLayer, poolLayer, fullyConnectedLayer]
-    layers = [convLayer, activLayer, poolLayer, fullyConnectedLayer]
+    convLayer = ConvolutionLayer()
+    activLayer = NeuralLayer(sigmoid)
+    poolLayer = NeuralLayer(pool)
+    
+    layers = [convLayer, activLayer, poolLayer]
     network = Network(layers)
+    network.train(input, [1, 0])
 
 if __name__ == '__main__':
     main()

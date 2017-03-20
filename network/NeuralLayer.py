@@ -1,8 +1,9 @@
 from network.Neuron import Neuron
+from network import constants
 
 class NeuralLayer:
     
-    def __init__(self, neuronCount, func):
+    def __init__(self, func, neuronCount = constants.NEURON_COUNT):
         self.neurons = [ self.createNueron(func) for i in range(0, neuronCount) ]
     
     def createNueron(self, func):
@@ -14,9 +15,10 @@ class NeuralLayer:
 
     def process(self, inputs):
         """
-        Passes the inputs to their corresponding nueron.
-        That is, input[i] -> nueron[i]
+        Passes the inputs to their corresponding neuron.
+        That is, input[i] -> neuron[i]
         """
+        import pdb;pdb.set_trace()
         assert len(inputs) == len(self.neurons)
 
         outputs = []
@@ -27,4 +29,5 @@ class NeuralLayer:
             result = neuron.process(inputs[i])
             outputs.append(result)
         
+        print("Output from layer: " + str(outputs))
         return outputs
