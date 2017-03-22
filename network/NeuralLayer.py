@@ -1,4 +1,5 @@
 from network.Neuron import Neuron
+from network.Matrix import Matrix
 from network import constants
 
 class NeuralLayer:
@@ -18,7 +19,6 @@ class NeuralLayer:
         Passes the inputs to their corresponding neuron.
         That is, input[i] -> neuron[i]
         """
-        import pdb;pdb.set_trace()
         assert len(inputs) == len(self.neurons)
 
         outputs = []
@@ -29,5 +29,7 @@ class NeuralLayer:
             result = neuron.process(inputs[i])
             outputs.append(result)
         
-        print("Output from layer: " + str(outputs))
+        
+        # print("Input to layer(" + str(self) + "): " + str(inputs))
+        # print("Output from layer(" + str(self) + "): " + str(outputs))
         return outputs
