@@ -75,11 +75,12 @@ class FullyConnectedLayer(NeuralLayer):
 
 class OutputLayer(NeuralLayer):
     
-    def __init__(self):
+    def __init__(self, votingDim = [3, 3]):
+        self.votingDim = votingDim
         super(OutputLayer, self).__init__(self.vote, 2)
             
     def createNueron(self, func):
-        return WeightedNeuron(func)
+        return WeightedNeuron(func, weightsDim = self.votingDim)
 
     def process(self, inputs):
         """

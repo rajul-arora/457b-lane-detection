@@ -14,7 +14,7 @@ class Network:
         # numbeOfPixels = len(input) * len(input[0])
         inputLayer = InputLayer(self.inputFunction, 1)
         finalFCL = FullyConnectedLayer(neuronCount = 1)
-        outputLayer = OutputLayer()
+        outputLayer = OutputLayer([4, 3])
 
         error = 0
         running = True
@@ -32,7 +32,7 @@ class Network:
             error = (expectedOutput[0] - votes[0]) + (expectedOutput[1] - votes[1])
             running = error > constants.EPSILON
 
-            print ("Error " + str(error))
+            print ("Output dim: " + str(data[0].size()) + " ;Error " + str(error))
             # import pdb;pdb.set_trace()
 
         print("\n\nHooray!!! we're done! Final Error: " + str(error));

@@ -125,7 +125,7 @@ def main():
     activLayer = NeuralLayer(sigmoid)
     poolLayer = NeuralLayer(pool)
     
-    layers = [convLayer, activLayer, poolLayer]
+    layers = [convLayer, activLayer, poolLayer, convLayer, activLayer, convLayer, activLayer, poolLayer]
     network = Network(layers)
     network.train(input, [1, 0])
 

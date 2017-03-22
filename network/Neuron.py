@@ -37,8 +37,8 @@ class WeightedNeuron(Neuron):
 
         # output = [[0 for x in range(width)] for y in range(height)]
         output = Matrix(weightsDim)
-        for i in range(width):
-            for j in range(height):
+        for i in range(height):
+            for j in range(width):
                 output[i][j] = random.uniform(0, 1)
 
         return output
