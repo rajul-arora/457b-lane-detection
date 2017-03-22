@@ -85,7 +85,6 @@ class OutputLayer(NeuralLayer):
         """
         Passes the input to both output voters
         """
-        print(" -- OUTPUT LAYER --")
         # import pdb; pdb.set_trace();
         assert len(inputs) == 1
 

@@ -17,12 +17,9 @@ class Network:
         outputLayer = OutputLayer()
 
         error = 0
-        data = [input]
         running = True
-        while running:            
-            data = data[0]
-            print("Data dimensions: " + str(data.size()))
-            data = inputLayer.process(data)
+        while running:           
+            data = inputLayer.process(input)
             for layer in self.layers:
                 layer.setError(error)
 
@@ -36,7 +33,9 @@ class Network:
             running = error > constants.EPSILON
 
             print ("Error " + str(error))
-            import pdb;pdb.set_trace()
+            # import pdb;pdb.set_trace()
+
+        print("\n\nHooray!!! we're done! Final Error: " + str(error));
 
     def inputFunction(input):
         """

@@ -1,7 +1,7 @@
 from network.Matrix import Matrix
 
 NEURON_COUNT = 3
-EPSILON = 0.0001
+EPSILON = 0.1
 LEARNING_RATE = 0.1
 
 
