@@ -31,6 +31,7 @@ class ConvolutionLayer(NeuralLayer):
         denom = featureDim[0] * featureDim[1]
 
         for i in range(outputHeight):
+            print("i == " + str(i))
             for j in range(outputWidth):
                 sum = 0
                 for x in range(feature.height()):
@@ -38,7 +39,7 @@ class ConvolutionLayer(NeuralLayer):
                         sum += input[x+i][y+j] * feature[x][y]
 
                 output[i][j] = sum / denom
-
+        print('done')
         return output
 
 class FullyConnectedLayer(NeuralLayer):

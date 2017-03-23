@@ -4,6 +4,8 @@ import math
 NEURON_COUNT = 3
 EPSILON = 0.1
 LEARNING_RATE = 0.1
+GREYSCALE = True
+PARTIAL_IN_IMG_DIM = [32, 32]
 
 
 def adeline(input: Matrix, error, weights: Matrix):

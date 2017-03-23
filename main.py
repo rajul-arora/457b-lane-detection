@@ -1,4 +1,8 @@
 import math
+import cv2
+import numpy
+import os
+import sys
 from network.Neuron import Neuron
 from network.NeuralLayer import NeuralLayer
 from network.CustomLayers import ConvolutionLayer
@@ -18,12 +22,12 @@ def pool(input: Matrix):
     for i in range(0, input.height(), stride):
 
         outputRow = []
-        for j in range(0, input.width(), stride):            
+        for j in range(0, input.width(), stride):
             maxVal = max(input, windowSize, i, j)
             outputRow.append(maxVal)
 
         output.append(outputRow)
-    
+
     return Matrix.convert(output)
 
 def max(input: Matrix, windowSize, xOffset, yOffset):
@@ -33,16 +37,16 @@ def max(input: Matrix, windowSize, xOffset, yOffset):
         for j in range(yOffset, min(windowSize + yOffset, input.width())):
             if input[i][j] > res:
                 res = input[i][j]
-    
+
     return res
 
 def avg(input, windowSize, xOffset, yOffset):
-    
+
     res = 0
     for i in range(xOffset, windowSize + xOffset):
         for j in range(yOffset, windowSize + yOffset):
             res += input[i][j]
-    
+
     return res / (windowSize * windowSize)
 
 def testConvolution():
@@ -91,6 +95,20 @@ def testFullyConnected():
 
     print(fullyConnectedFunction([m1,m2]))
 
+
+def getImagePixelMatrices():
+    dir = "./lane_images/cordova1/"
+    files = os.listdir(dir)
+
+    for file in files:
+        return getPixelMatrix(dir, file)
+
+def getPixelMatrix(dir, file):
+    img = cv2.imread(dir + file)
+    if constants.GREYSCALE:
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    return img
+
 def main():
 
     # testConvolution()
@@ -99,20 +117,29 @@ def main():
 
     # Call Open CV here to get the input
     # image = [[0 for x in range(16) ] for y in range(16)]
-    image = Matrix([16, 16])
-    for i in range(16):
-        image[15 - i][i] = 1
 
-    input = image
-    print (str(input))
+
+
+    # image = Matrix([16, 16])
+    # for i in range(16):
+    #     image[15 - i][i] = 1
+    #
+    # input = image
+    # print (str(input))
+
+    input = getImagePixelMatrices()
+    input = Matrix.convert(input)
 
     convLayer = ConvolutionLayer(activation = constants.relu)
     # activLayer = NeuralLayer(constants.sigmoid)
     poolLayer = NeuralLayer(func = pool)
-    
+
     layers = [convLayer, poolLayer]
     network = Network(layers)
     network.train(input, [1, 0])
+
+
+
 
     test = Matrix([16, 16])
     offset = 1
