@@ -117,17 +117,33 @@ def main():
     # image = [[0 for x in range(16) ] for y in range(16)]
     image = Matrix([16, 16])
     for i in range(16):
-        image[i][i] = 1
+        image[15 - i][i] = 1
 
     input = image
+    print (str(input))
 
     convLayer = ConvolutionLayer()
     activLayer = NeuralLayer(sigmoid)
     poolLayer = NeuralLayer(pool)
     
-    layers = [convLayer, activLayer, poolLayer, convLayer, activLayer, convLayer, activLayer, poolLayer]
+    layers = [convLayer, activLayer, poolLayer, convLayer, activLayer, poolLayer, convLayer, activLayer, poolLayer]
     network = Network(layers)
     network.train(input, [1, 0])
+
+    test = Matrix([16, 16])
+    offset = 1
+    # Diagonalise the center
+    for i in range(4, 12):
+        test[15 - i][i] = 1
+    # Off-center the diagonals at the ends
+    for i in range(0, 4):
+        test[15 - i][i + offset] = 1
+    for i in range(12, 16):
+        test[15 - i][i - offset] = 1
+
+    print ("\nTesting Image (Expecting a 'yes'): " + str(test))
+    result = network.run(test)
+    print("CNN Verdict: " + "YES" if result == 1 else "NO")
 
 if __name__ == '__main__':
     main()
