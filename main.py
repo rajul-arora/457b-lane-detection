@@ -109,6 +109,19 @@ def getPixelMatrix(dir, file):
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     return img
 
+def blockshaped(arr, nrows, ncols):
+    """
+    Return an array of shape (n, nrows, ncols) where
+    n * nrows * ncols = arr.size
+
+    If arr is a 2D array, the returned array should look like n subblocks with
+    each subblock preserving the "physical" layout of arr.
+    """
+    h, w = arr.shape
+    return (arr.reshape(h//nrows, nrows, -1, ncols)
+               .swapaxes(1,2)
+               .reshape(-1, nrows, ncols))
+
 def main():
 
     # testConvolution()
@@ -127,8 +140,11 @@ def main():
     # input = image
     # print (str(input))
 
-    input = getImagePixelMatrices()
-    input = Matrix.convert(input)
+    wholeInputImage = getImagePixelMatrices()
+    partialInputImages = blockshaped(wholeInputImage, constants.PARTIAL_IN_IMG_DIM[0], constants.PARTIAL_IN_IMG_DIM[1])
+    partialInputImagesAsMatrices = []
+    for i in range(len(partialInputImages)):
+        partialInputImagesAsMatrices.append(Matrix.convert(partialInputImages[i]))
 
     convLayer = ConvolutionLayer(activation = constants.relu)
     # activLayer = NeuralLayer(constants.sigmoid)
@@ -136,7 +152,7 @@ def main():
 
     layers = [convLayer, poolLayer]
     network = Network(layers)
-    network.train(input, [1, 0])
+    network.train(partialInputImagesAsMatrices[0], [1, 0]) #Just try the first input image segment for now
 
 
 
