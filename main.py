@@ -4,23 +4,7 @@ from network.NeuralLayer import NeuralLayer
 from network.CustomLayers import ConvolutionLayer
 from network.Network import Network
 from network.Matrix import Matrix
-import network.constants
-
-def sigmoid(input: Matrix):
-    """
-    Performs sigmoid on all elements in input and returns a matrix of the same size
-    """
-
-    # Instantiate output as a matrix same dimensions as input
-    # output = [ [0 for i in range(len(input))] for j in range(len(input[0])) ] 
-    output = Matrix(input.size())
-
-    # Perform sigmoid on all elements in input matrix
-    for x in range(input.height()):
-        for y in range(input.width()):
-            output[x][y] = 1 /  (1 + math.exp(-1 * input[x][y])) 
-
-    return output
+from network import constants
 
 def pool(input: Matrix):
     """
@@ -123,10 +107,10 @@ def main():
     print (str(input))
 
     convLayer = ConvolutionLayer()
-    activLayer = NeuralLayer(sigmoid)
+    activLayer = NeuralLayer(constants.sigmoid)
     poolLayer = NeuralLayer(pool)
     
-    layers = [convLayer, activLayer, poolLayer, convLayer, activLayer, poolLayer, convLayer, activLayer, poolLayer]
+    layers = [convLayer, activLayer, poolLayer, convLayer, activLayer, poolLayer]
     network = Network(layers)
     network.train(input, [1, 0])
 

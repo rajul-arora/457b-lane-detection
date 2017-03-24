@@ -48,6 +48,31 @@ class Network:
         print ("Final Votes: " + str(votes))
         print("\n\nHooray!!! we're done! Final Error: " + str(error));
 
+    def calculateLoss(output, expectedOutput):
+        return mse(output, expectedOutput)
+
+    def mse(output, expectedOutput):
+        """
+        Mean Squared Error
+        """
+        assert len(output) == len(expectedOutput)
+
+        result = 0
+        for i in range(len(output)):
+            result += (expectedOutput[i] - constants.sigmoid(output[i])) ** 2
+
+        return result/2
+
+    def sum(output, expectedOutput):        
+        assert len(output) == len(expectedOutput)
+
+        result = 0
+        for i in range(len(output)):
+            result += abs(expectedOutput[i] - output[i])
+
+        return result
+        
+
     def inputFunction(input):
         """
         Simply just passes the inputs through
