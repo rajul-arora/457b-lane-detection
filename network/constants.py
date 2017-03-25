@@ -70,3 +70,14 @@ def relu(input: Matrix):
 
     return output
 
+def dReLU(X: Matrix):
+    """
+    Calculates the derivative of ReLU of the given input matrix X.
+    """
+    output = [[0 for i in range(0,len(X))] for j in range(0,len(X[0]))]
+
+    for i in range(X.height()):
+        for j in range(X.width()):
+            output[i][j] = 1 if X[i][j] > 0 else 0
+
+    return output

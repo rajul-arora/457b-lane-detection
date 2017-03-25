@@ -38,15 +38,9 @@ class Network:
 
             outputs = self.finalFCL.process(data)
 
-<<<<<<< e972701c7ba9e3f6c1e715760f021158e7dadbdc
             # outputs = self.outputLayer.process(data)
             error = abs(expectedOutput[0] - outputs[0]) + abs(expectedOutput[1] - outputs[1])
             running = error > constants.EPSILON and False
-=======
-            votes = self.outputLayer.process(data)
-            error = 0.5 * abs(expectedOutput[0] - votes[0]) ** 2 + 0.5 * abs(expectedOutput[1] - votes[1]) ** 2
-            running = error > constants.EPSILON
->>>>>>> Created ReLU and Derivative of ReLU functions
 
             print ("Output dim: " + str(data[0].size()) + " Error " + str(error))
             # import pdb;pdb.set_trace()
@@ -68,30 +62,6 @@ class Network:
             result += (expectedOutput[i] - constants.sigmoid(output[i])) ** 2
 
         return result/2
-
-    def ReLU(X: Matrix):
-        """
-        Calculates the ReLU of the given input matrix X.
-        """
-        output = [[0 for i in range(0,len(X))] for j in range(0,len(X[0]))]
-
-        for i in range(0,len(X)):
-            for j in range(0,len(X[0])):
-                output[i][j] = max(0, X[i][j])
-
-        return output
-
-    def dReLU(X: Matrix):
-        """
-        Calculates the derivative of ReLU of the given input matrix X.
-        """
-        output = [[0 for i in range(0,len(X))] for j in range(0,len(X[0]))]
-
-        for i in range(0,len(X)):
-            for j in range(0,len(X[0])):
-                output[i][j] = 1 if X[i][j] > 0 else 0
-
-        return output
 
     def sum(output, expectedOutput):        
         assert len(output) == len(expectedOutput)
