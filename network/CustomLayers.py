@@ -3,14 +3,17 @@ from network.Neuron import WeightedNeuron
 from network.NeuralLayer import NeuralLayer
 from network.Matrix import Matrix
 from network import constants
+import math
 
 class ConvolutionLayer(NeuralLayer):
     
-    def __init__(self):
-        super(ConvolutionLayer, self).__init__(self.convolve)
+    def __init__(self, activation, neuronsPerFilter = 9):
+        size = math.ceil(math.sqrt(neuronsPerFilter))
+        self.weightsDim = [size, size]
+        super(ConvolutionLayer, self).__init__(self.convolve, activation)
             
-    def createNueron(self, func):
-        return WeightedNeuron(func)
+    def createNueron(self, func, activation):
+        return WeightedNeuron(func = func, activation = activation, weightsDim = self.weightsDim)
 
     @staticmethod
     def convolve(input: Matrix, feature: Matrix):
@@ -40,8 +43,11 @@ class ConvolutionLayer(NeuralLayer):
 
 class FullyConnectedLayer(NeuralLayer):
     
-    def __init__(self, func = None, neuronCount = constants.NEURON_COUNT):
-        super(FullyConnectedLayer, self).__init__(self.combine if (func == None) else func, neuronCount)
+    def __init__(self, activation = None, neuronCount = constants.NEURON_COUNT):
+        super(FullyConnectedLayer, self).__init__(func = self.combine, activation = activation, neuronCount = neuronCount)
+
+    def createNueron(self, func, activation):
+        return WeightedNeuron(func, activation)
 
     def process(self, inputs):
         """
@@ -51,12 +57,15 @@ class FullyConnectedLayer(NeuralLayer):
         for neuron in self.neurons:
             # Process each neuron with all the inputs
             result = neuron.process(inputs)
+
+            # Take the dot product of result with weights to get output
+            result = self.dotProduct(result, neuron.weights)
             outputs.append(result)
         
         return outputs
 
     @staticmethod
-    def combine(inputs):
+    def combine(inputs, empty):
         """
         Takes a list of matrices and smushes their entries together into a single matrix
         Each row is each input as a a 1d array
@@ -67,11 +76,24 @@ class FullyConnectedLayer(NeuralLayer):
             for i in range(input.height()):
                 for j in range(input.width()):
                     vector.append(input[i][j])
-            # pdb.set_trace()
+                    
             output.append(vector)
         
-        # import pdb; pdb.set_trace();
         return Matrix.convert(output)
+
+    @staticmethod
+    def dotProduct(input: Matrix, weights: Matrix):
+        """
+        Performs dot-product of input with weights
+        """
+        weightsDim = weights.size()
+        denom = weightsDim[0] * weightsDim[1]
+        sum = 0
+        for x in range(min(input.height(), weights.height())):
+            for y in range(min(input.width(), weights.width())):
+                sum += input[x][y] * weights[x][y]
+
+        return sum / denom
 
 class OutputLayer(NeuralLayer):
     

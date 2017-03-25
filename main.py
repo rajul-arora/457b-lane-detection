@@ -106,11 +106,11 @@ def main():
     input = image
     print (str(input))
 
-    convLayer = ConvolutionLayer()
-    activLayer = NeuralLayer(constants.sigmoid)
-    poolLayer = NeuralLayer(pool)
+    convLayer = ConvolutionLayer(activation = constants.relu)
+    # activLayer = NeuralLayer(constants.sigmoid)
+    poolLayer = NeuralLayer(func = pool)
     
-    layers = [convLayer, activLayer, poolLayer, convLayer, activLayer, poolLayer]
+    layers = [convLayer, poolLayer]
     network = Network(layers)
     network.train(input, [1, 0])
 
@@ -125,9 +125,9 @@ def main():
     for i in range(12, 16):
         test[15 - i][i - offset] = 1
 
-    print ("\nTesting Image (Expecting a 'yes'): " + str(test))
-    result = network.run(test)
-    print("CNN Verdict: " + "YES" if result == 1 else "NO")
+    # print ("\nTesting Image (Expecting a 'yes'): " + str(test))
+    # result = network.run(test)
+    # print("CNN Verdict: " + "YES" if result == 1 else "NO")
 
 if __name__ == '__main__':
     main()

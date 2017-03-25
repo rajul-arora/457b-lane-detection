@@ -8,9 +8,9 @@ from network import constants
 class Network:
     def __init__(self, layers):
         self.layers = layers
-        self.inputLayer = InputLayer(None, 1)
-        self.finalFCL = FullyConnectedLayer(neuronCount = 1)
-        self.outputLayer = OutputLayer([4, 3])
+        self.inputLayer = InputLayer(None, neuronCount = 1)
+        self.finalFCL = FullyConnectedLayer(activation = constants.sigmoid, neuronCount = 2)
+        # self.outputLayer = OutputLayer([4, 3])
     
     def run(self, input: Matrix):
         
@@ -19,10 +19,10 @@ class Network:
             data = layer.process(data)
 
         data = self.finalFCL.process(data)
-        votes = self.outputLayer.process(data)
+        outputs = self.outputLayer.process(data)
 
         # Return your decision based on the vote
-        return 1 if votes[0] > votes[1] else 0
+        return 1 if outputs[0] > outputs[1] else 0
 
     def train(self, input: Matrix, expectedOutput):        
 
@@ -36,16 +36,16 @@ class Network:
                 # import pdb;pdb.set_trace()
                 data = layer.process(data)
 
-            data = self.finalFCL.process(data)
+            outputs = self.finalFCL.process(data)
 
-            votes = self.outputLayer.process(data)
-            error = abs(expectedOutput[0] - votes[0]) + abs(expectedOutput[1] - votes[1])
-            running = error > constants.EPSILON
+            # outputs = self.outputLayer.process(data)
+            error = abs(expectedOutput[0] - outputs[0]) + abs(expectedOutput[1] - outputs[1])
+            running = error > constants.EPSILON and False
 
             print ("Output dim: " + str(data[0].size()) + " ;Error " + str(error))
             # import pdb;pdb.set_trace()
 
-        print ("Final Votes: " + str(votes))
+        print ("Final Outputs: " + str(outputs))
         print("\n\nHooray!!! we're done! Final Error: " + str(error));
 
     def calculateLoss(output, expectedOutput):

@@ -52,3 +52,16 @@ def sigmoid(input: Matrix):
 
     return output
 
+def relu(input: Matrix):
+    """
+    Sets all negative numbers to 0. Returns a matrix of the same size
+    """
+    output = Matrix(input.size())
+
+    # Perform sigmoid on all elements in input matrix
+    for x in range(input.height()):
+        for y in range(input.width()):
+            output[x][y] = input[x][y] if input[x][y] > 0 else 0 
+
+    return output
+

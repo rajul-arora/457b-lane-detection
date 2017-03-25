@@ -4,11 +4,11 @@ from network import constants
 
 class NeuralLayer:
     
-    def __init__(self, func, neuronCount = constants.NEURON_COUNT):
-        self.neurons = [ self.createNueron(func) for i in range(0, neuronCount) ]
+    def __init__(self, func, activation = None, neuronCount = constants.NEURON_COUNT):
+        self.neurons = [ self.createNueron(func, activation) for i in range(0, neuronCount) ]
     
-    def createNueron(self, func):
-        return Neuron(func)
+    def createNueron(self, func, activation):
+        return Neuron(func, activation)
 
     def setError(self, error):
         for neuron in self.neurons:
