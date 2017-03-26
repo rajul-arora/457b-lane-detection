@@ -13,7 +13,6 @@ class Network:
         # self.outputLayer = OutputLayer([4, 3])
     
     def run(self, input: Matrix):
-        
         data = self.inputLayer.process(input)
         for layer in self.layers:
             data = layer.process(data)
@@ -28,29 +27,36 @@ class Network:
 
         error = 0
         running = True
+
         while running:           
             data = self.inputLayer.process(input)
-            for layer in self.layers:
-                layer.setError(error)
 
-                # import pdb;pdb.set_trace()
+            for layer in self.layers:
                 data = layer.process(data)
 
-            outputs = self.finalFCL.process(data)
-
+            output = self.finalFCL.process(data)
             # outputs = self.outputLayer.process(data)
-            error = abs(expectedOutput[0] - outputs[0]) + abs(expectedOutput[1] - outputs[1])
-            running = error > constants.EPSILON and False
+            error = self.calculateLoss(output, expectedOutput)
+            running = error > constants.EPSILON
+
+            if running: 
+                import pdb;pdb.set_trace()
+                deltas = self.finalFCL.calculateDeltas(output, expectedOutput)
+                for layer in reversed(self.layers):
+                    layer.adjustWeights(deltas)
+                    deltas = layer.calculateDeltas(deltas)
 
             print ("Output dim: " + str(data[0].size()) + " Error " + str(error))
             # import pdb;pdb.set_trace()
 
-        print ("Final Outputs: " + str(outputs))
+        print ("Final Outputs: " + str(output))
         print("\n\nHooray!!! we're done! Final Error: " + str(error));
 
-    def calculateLoss(output, expectedOutput):
-        return mse(output, expectedOutput)
+    
+    def calculateLoss(self, output, expectedOutput):
+        return self.mse(output, expectedOutput)
 
+    @staticmethod
     def mse(output, expectedOutput):
         """
         Mean Squared Error
@@ -59,7 +65,7 @@ class Network:
 
         result = 0
         for i in range(len(output)):
-            result += (expectedOutput[i] - constants.sigmoid(output[i])) ** 2
+            result += (expectedOutput[i] - output[i]) ** 2
 
         return result/2
 

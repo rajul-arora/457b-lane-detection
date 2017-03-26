@@ -10,37 +10,6 @@ OUTPUT_DIRECTORY = './lane_images/cordova1_output_matrices/'
 IMAGE_WIDTH = 640
 IMAGE_HEIGHT = 480
 
-
-def adeline(input: Matrix, error, weights: Matrix):
-    """
-    Performs adeline to get the next set of weights
-    """
-    if input == None:
-        return weights
-
-    # output = [[0 for x in range(len(weights))] for y in range(len(weights[0]))]
-    output = Matrix(weights.size())
-    for i in range(min(input.height(), weights.height())):
-        for j in range(min(input.width(), weights.width())):
-            output[i][j] = weights[i][j] + LEARNING_RATE * error * input[i][j]
-
-    return output
-
-
-def adeline_general(input: Matrix, error, weights: Matrix):
-    """
-    Performs adeline to get the next set of weights
-    """
-    if input == None:
-        return weights
-
-    output = Matrix(weights.size())
-    for i in range(min(input.height(), weights.height())):
-        for j in range(min(input.width(), weights.width())):
-            output[i][j] = weights[i][j] + LEARNING_RATE * error * input[i][j]
-
-    return output
-
 def sigmoid(input: Matrix):
     """
     Performs sigmoid on all elements in input and returns a matrix of the same size
@@ -57,7 +26,11 @@ def sigmoid(input: Matrix):
 
     return output
 
-def relu(input: Matrix):
+def sigderiv(input):    
+    print(input)
+    return (-1 * math.exp(-1 * input)) / (1 + math.exp(-1 * input)) ** 2
+
+def ReLU(input: Matrix):
     """
     Sets all negative numbers to 0. Returns a matrix of the same size
     """
@@ -74,7 +47,7 @@ def dReLU(X: Matrix):
     """
     Calculates the derivative of ReLU of the given input matrix X.
     """
-    output = [[0 for i in range(0,len(X))] for j in range(0,len(X[0]))]
+    output = Matrix(X.size())
 
     for i in range(X.height()):
         for j in range(X.width()):

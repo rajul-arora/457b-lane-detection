@@ -15,6 +15,18 @@ class ConvolutionLayer(NeuralLayer):
     def createNueron(self, func, activation):
         return WeightedNeuron(func = func, activation = activation, weightsDim = self.weightsDim)
 
+    def calculateDeltas(self, prevDeltas): 
+        """
+        Calculates the delta for the given output and expected output.
+        """
+        assert len(prevDeltas) == len(self.nuerons)
+        
+        deltas = []
+        for i in range(0, len(prevDeltas)):
+            delta = constants.sigderiv(self.neurons[i].prevResult) * prevDeltas[i]
+            deltas.append(delta)
+        return deltas 
+
     @staticmethod
     def convolve(input: Matrix, feature: Matrix):
         """
@@ -59,9 +71,22 @@ class FullyConnectedLayer(NeuralLayer):
 
             # Take the dot product of result with weights to get output
             result = self.dotProduct(result, neuron.weights)
+            neuron.prevResult = result
             outputs.append(result)
         
         return outputs
+
+    def calculateDeltas(self, output, expectedOutput): 
+        """
+        Calculates the delta for the given output and expected output.
+        """
+        assert(len(output) == len(expectedOutput))
+        deltas = []
+        # import pdb;pdb.set_trace()
+        for i in range(0, len(output)):
+            delta = constants.sigderiv(self.neurons[i].prevResult) * (expectedOutput[i] - output[i])
+            deltas.append(delta)
+        return deltas
 
     @staticmethod
     def combine(inputs, empty):

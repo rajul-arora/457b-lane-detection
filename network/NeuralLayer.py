@@ -14,6 +14,16 @@ class NeuralLayer:
         for neuron in self.neurons:
             neuron.setError(error)
 
+    def calculateDeltas(self, deltas):
+        return deltas
+
+    def adjustWeights(self, deltas):
+        """"
+        Adjusts the weights using the values of delta propagated to it.
+        """
+        for neuron in self.neurons:
+            neuron.adjustWeights(deltas)
+
     def process(self, inputs):
         """
         Passes the inputs to their corresponding neuron.

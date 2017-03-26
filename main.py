@@ -153,7 +153,7 @@ def main():
         for i in range(len(partialInputImages)):
             partialInputOutputMatrices.append((Matrix.convert(partialInputImages[i]), Matrix.convert(partialOutputMatrices[i])))
 
-    convLayer = ConvolutionLayer(activation = constants.relu)
+    convLayer = ConvolutionLayer(activation = constants.ReLU)
     # activLayer = NeuralLayer(constants.sigmoid)
     poolLayer = NeuralLayer(func = pool)
 
