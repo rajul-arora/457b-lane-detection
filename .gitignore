@@ -94,3 +94,5 @@ ENV/
 
 # DS_Store
 .DS_Store
+
+lane_images/cordova1_input_coordinates/
