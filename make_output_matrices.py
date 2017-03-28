@@ -8,21 +8,88 @@ IMAGE_HEIGHT = 480
 
 double_line_numbers = []
 
+def widen(y, x, start, width, matrix):
+    for i in range(width):
+        matrix[y][x + start + i] = [255, 0, 0]
+        matrix[y][x - start - i] = [255, 0, 0]
+
+
+def widen_according_to_y_axis(y, x, is_double):
+    start = 1
+    if is_double:
+        start = 2
+    if y > 345:
+        width = 3
+        widen(y, x, start, width, matrix)
+        widen(y-1, x, start, width, matrix)
+        if is_double:
+            widen(y, x, start, width + 5, matrix)
+            widen(y-1, x, start, width + 5, matrix)
+    if y > 330 and y <= 345:
+        width = 2
+        widen(y, x, start, width, matrix)
+        widen(y-1, x, start, width, matrix)
+        if is_double:
+            widen(y, x, start, width + 5, matrix)
+            widen(y-1, x, start, width + 5, matrix)
+    elif y <= 330 and y > 290:
+        width = 1
+        widen(y, x, start, width, matrix)
+        widen(y-1, x, start, width, matrix)
+
+        if is_double:
+            widen(y, x, start, width + 4, matrix)
+            widen(y - 1, x, start, width + 4, matrix)
+    elif y <= 290 and y > 250:
+        matrix[y][x + 1] = [255, 0, 0]
+        matrix[y][x - 1] = [255, 0, 0]
+
+        matrix[y-1][x + 1] = [255, 0, 0]
+        matrix[y-1][x - 1] = [255, 0, 0]
+
+        if is_double:
+            widen(y, x, start, 3, matrix)
+            widen(y - 1, x, start, 3, matrix)
+    elif y <= 250 and y > 225 and is_double:
+        widen(y, x, start, 2, matrix)
+        widen(y - 1, x, start, 2, matrix)
+
 
 def draw_line_in_matrix(coordinate_pairs, is_double_line):
     for coordinate_pair in coordinate_pairs:
-        matrix[coordinate_pair[0], coordinate_pair[1]] = 1
+        if coordinate_pair[1] < 200:
+            coordinate_pair = (coordinate_pair[0] - 2, coordinate_pair[1])
+        if coordinate_pair[1] < 240 and coordinate_pair[1] > 200:
+            coordinate_pair = (coordinate_pair[0] - 1, coordinate_pair[1])
+        matrix[coordinate_pair[1], coordinate_pair[0]] = [255, 0, 0]
+        matrix[coordinate_pair[1] - 1, coordinate_pair[0]] = [255, 0, 0]
         if is_double_line:
-            matrix[coordinate_pair[0] - 1, coordinate_pair[1] - 1] = 1
+            matrix[coordinate_pair[1] - 1, coordinate_pair[0] - 1] = [255, 0, 0]
+            matrix[coordinate_pair[1] - 1, coordinate_pair[0]] = [255, 0, 0]
+            matrix[coordinate_pair[1] - 1, coordinate_pair[0] + 1] = [255, 0, 0]
+            matrix[coordinate_pair[1] + 1, coordinate_pair[0] - 1] = [255, 0, 0]
+            matrix[coordinate_pair[1] + 1, coordinate_pair[0]] = [255, 0, 0]
+            matrix[coordinate_pair[1] + 1, coordinate_pair[0] + 1] = [255, 0, 0]
+
+            matrix[coordinate_pair[1], coordinate_pair[0] - 1] = [255, 0, 0]
+            matrix[coordinate_pair[1], coordinate_pair[0] + 1] = [255, 0, 0]
+
+            matrix[coordinate_pair[1] - 1, coordinate_pair[0] - 1] = [255, 0, 0]
+            matrix[coordinate_pair[1] - 1, coordinate_pair[0] + 1] = [255, 0, 0]
+
+        widen_according_to_y_axis(coordinate_pair[1], coordinate_pair[0], is_double_line)
+
 
 
 half_coordinate_pair_lists = []
-with open('lane_images/cordova1_lane_coordinates/f00000.txt') as file:
+with open('lane_images/cordova1_lane_coordinates/f00010.txt') as file:
     for line in file:
         half_coordinate_pair_list = [elt.strip() for elt in line.split(' ')]
         for i in range(0, len(half_coordinate_pair_list)):
             if half_coordinate_pair_list[i] and half_coordinate_pair_list[i] != 'dy':
                 half_coordinate_pair_list[i] = int(half_coordinate_pair_list[i])
+        if type(half_coordinate_pair_list[-1]) is not int:
+            half_coordinate_pair_list.pop(-1)
         half_coordinate_pair_lists.append(half_coordinate_pair_list)
 
 assert len(half_coordinate_pair_lists) % 2 == 0
@@ -51,7 +118,6 @@ for i in range(0, int(num_lines)):
         pair = (int(round(lane_pixel_x_coordinates[j], 0)), int(round(lane_pixel_y_coordinates[j], 0)))
         lane_pixel_coordinate_pairs.append(pair)
 
-
     lines.append(lane_pixel_coordinate_pairs)
     line_index += 1
 
@@ -67,7 +133,7 @@ for line in lines:
     for coordinate_pair in line:
         draw_line_in_matrix(line, line_index in double_line_numbers)
     line_index += 1
-
+cv2.medianBlur(matrix, 5)
 cv2.imwrite('test.jpg', matrix)
 # plt.plot([x[0] for x in lines[0]], [x[1] for x in lines[0]], [x[0] for x in lines[1]], [x[1] for x in lines[1]], [x[0] for x in lines[2]], [x[1] for x in lines[2]])
 # plt.axis([0, IMAGE_WIDTH, 0, IMAGE_HEIGHT])
