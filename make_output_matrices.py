@@ -8,6 +8,13 @@ IMAGE_HEIGHT = 480
 double_line_numbers = []
 
 
+def draw_line_in_matrix(coordinate_pairs, is_double_line):
+    for coordinate_pair in coordinate_pairs:
+        matrix[coordinate_pair[0], coordinate_pair[1]] = 1
+        if is_double_line:
+            matrix[coordinate_pair[0] - 1, coordinate_pair[1] - 1] = 1
+
+
 half_coordinate_pair_lists = []
 with open('lane_images/cordova1_lane_coordinates/f00000.txt') as file:
     for line in file:
@@ -58,12 +65,7 @@ np.set_printoptions(linewidth=3000)
 matrix = np.zeros(shape=(IMAGE_HEIGHT, IMAGE_WIDTH), dtype=np.int)
 line_index = 0
 for line in lines:
-    double_line = line_index in double_line_numbers
-    for coordinate_pair in line:
-        matrix[coordinate_pair[0], coordinate_pair[1]] = 1
-        if double_line:
-            matrix[coordinate_pair[0] - 1, coordinate_pair[1] - 1] = 1
-            #etc
+    draw_line_in_matrix(line, line_index in double_line_numbers)
     line_index += 1
 
 plt.plot([x[0] for x in lines[0]], [x[1] for x in lines[0]], [x[0] for x in lines[1]], [x[1] for x in lines[1]], [x[0] for x in lines[2]], [x[1] for x in lines[2]])
