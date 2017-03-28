@@ -20,11 +20,8 @@ with open('lane_images/cordova1_lane_coordinates/f00000.txt') as file:
     for line in file:
         half_coordinate_pair_list = [elt.strip() for elt in line.split(' ')]
         for i in range(0, len(half_coordinate_pair_list)):
-            if half_coordinate_pair_list[i]:
-                if half_coordinate_pair_list[i] == 'dy':
-                    half_coordinate_pair_list[i] = half_coordinate_pair_list[i]
-                else:
-                    half_coordinate_pair_list[i] = int(half_coordinate_pair_list[i])
+            if half_coordinate_pair_list[i] and half_coordinate_pair_list[i] != 'dy':
+                half_coordinate_pair_list[i] = int(half_coordinate_pair_list[i])
         half_coordinate_pair_lists.append(half_coordinate_pair_list)
 
 assert len(half_coordinate_pair_lists) % 2 == 0
