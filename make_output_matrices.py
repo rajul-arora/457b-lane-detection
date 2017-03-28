@@ -9,16 +9,20 @@ IMAGE_HEIGHT = 480
 double_line_numbers = []
 
 
+def draw_line_in_matrix(coordinate_pairs, is_double_line):
+    for coordinate_pair in coordinate_pairs:
+        matrix[coordinate_pair[0], coordinate_pair[1]] = 1
+        if is_double_line:
+            matrix[coordinate_pair[0] - 1, coordinate_pair[1] - 1] = 1
+
+
 half_coordinate_pair_lists = []
 with open('lane_images/cordova1_lane_coordinates/f00000.txt') as file:
     for line in file:
         half_coordinate_pair_list = [elt.strip() for elt in line.split(' ')]
         for i in range(0, len(half_coordinate_pair_list)):
-            if half_coordinate_pair_list[i]:
-                if half_coordinate_pair_list[i] == 'dy':
-                    half_coordinate_pair_list[i] = half_coordinate_pair_list[i]
-                else:
-                    half_coordinate_pair_list[i] = int(half_coordinate_pair_list[i])
+            if half_coordinate_pair_list[i] and half_coordinate_pair_list[i] != 'dy':
+                half_coordinate_pair_list[i] = int(half_coordinate_pair_list[i])
         half_coordinate_pair_lists.append(half_coordinate_pair_list)
 
 assert len(half_coordinate_pair_lists) % 2 == 0
@@ -60,14 +64,8 @@ matrix = np.zeros(shape=(IMAGE_HEIGHT, IMAGE_WIDTH, 3), dtype=np.int)
 matrix.fill(255)
 line_index = 0
 for line in lines:
-    double_line = line_index in double_line_numbers
     for coordinate_pair in line:
-        matrix[coordinate_pair[1], coordinate_pair[0]] = [255, 0, 0]
-        if double_line:
-            matrix[coordinate_pair[1] - 1, coordinate_pair[0] - 1] = [255, 0, 0]
-            matrix[coordinate_pair[1] - 1, coordinate_pair[0]] = [255, 0, 0]
-            matrix[coordinate_pair[1] ]
-            #etc
+        draw_line_in_matrix(line, line_index in double_line_numbers)
     line_index += 1
 
 cv2.imwrite('test.jpg', matrix)
