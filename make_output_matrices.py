@@ -138,14 +138,7 @@ def generate_output_matrix_file_for_input_file(file_name):
         line_index += 1
     #cv2.medianBlur(matrix, 5)
     cv2.imwrite('test.jpg', matrix)
-    # plt.plot([x[0] for x in lines[0]], [x[1] for x in lines[0]], [x[0] for x in lines[1]], [x[1] for x in lines[1]], [x[0] for x in lines[2]], [x[1] for x in lines[2]])
-    # plt.axis([0, IMAGE_WIDTH, 0, IMAGE_HEIGHT])
-    # plt.gca().invert_yaxis()
-    # plt.show()
-    # f = open('f00000matrix.txt', 'w')
-    # for row in matrix:
-    #     f.write(str(row) + '\n')
-    # f.close()
+
 
 os.chdir("lane_images/cordova1_input_coordinates/")
 for file in glob.glob("*.txt"):
