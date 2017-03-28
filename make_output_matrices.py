@@ -17,14 +17,15 @@ def draw_line_in_matrix(matrix, coordinate_pairs, is_double_line):
             matrix[coordinate_pair[0] - 1, coordinate_pair[1] - 1] = 1
 
 
-def generate_output_matrix_file_for_input_file(input_file):
+def generate_output_matrix_file_for_input_file(file_name):
     half_coordinate_pair_lists = []
-    for line in input_file:
-        half_coordinate_pair_list = [elt.strip() for elt in line.split(' ')]
-        for i in range(0, len(half_coordinate_pair_list)):
-            if half_coordinate_pair_list[i] and half_coordinate_pair_list[i] != 'dy':
-                half_coordinate_pair_list[i] = int(half_coordinate_pair_list[i])
-        half_coordinate_pair_lists.append(half_coordinate_pair_list)
+    with open(file_name) as input_file:
+        for line in input_file:
+            half_coordinate_pair_list = [elt.strip() for elt in line.split(' ')]
+            for i in range(0, len(half_coordinate_pair_list)):
+                if half_coordinate_pair_list[i] and half_coordinate_pair_list[i] != 'dy':
+                    half_coordinate_pair_list[i] = int(half_coordinate_pair_list[i])
+            half_coordinate_pair_lists.append(half_coordinate_pair_list)
 
     assert len(half_coordinate_pair_lists) % 2 == 0
     num_lines = len(half_coordinate_pair_lists) / 2
@@ -76,7 +77,7 @@ def generate_output_matrix_file_for_input_file(input_file):
     #     f.write(str(row) + '\n')
     # f.close()
 
-os.chdir("/lane_images/cordova1_lane_coordinates")
+os.chdir("lane_images/cordova1_input_coordinates/")
 for file in glob.glob("*.txt"):
     generate_output_matrix_file_for_input_file(file)
 
