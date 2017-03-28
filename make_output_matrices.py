@@ -1,6 +1,7 @@
 from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
 import numpy as np
+import cv2
 
 IMAGE_WIDTH = 640
 IMAGE_HEIGHT = 480
@@ -34,7 +35,7 @@ for i in range(0, int(num_lines)):
 
     min_x = min(x[0], x[-1])
     max_x = max(x[0], x[-1])
-    num_x = max_x - min_x
+    num_x = max_x - min_x + 1
     lane_pixel_x_coordinates = np.linspace(min_x, max_x, num=num_x)
 
     f = interp1d(x, y)
@@ -55,21 +56,25 @@ for line in lines:
     print('\n')
 
 np.set_printoptions(linewidth=3000)
-matrix = np.zeros(shape=(IMAGE_HEIGHT, IMAGE_WIDTH), dtype=np.int)
+matrix = np.zeros(shape=(IMAGE_HEIGHT, IMAGE_WIDTH, 3), dtype=np.int)
+matrix.fill(255)
 line_index = 0
 for line in lines:
     double_line = line_index in double_line_numbers
     for coordinate_pair in line:
-        matrix[coordinate_pair[0], coordinate_pair[1]] = 1
+        matrix[coordinate_pair[1], coordinate_pair[0]] = [255, 0, 0]
         if double_line:
-            matrix[coordinate_pair[0] - 1, coordinate_pair[1] - 1] = 1
+            matrix[coordinate_pair[1] - 1, coordinate_pair[0] - 1] = [255, 0, 0]
+            matrix[coordinate_pair[1] - 1, coordinate_pair[0]] = [255, 0, 0]
+            matrix[coordinate_pair[1] ]
             #etc
     line_index += 1
 
-plt.plot([x[0] for x in lines[0]], [x[1] for x in lines[0]], [x[0] for x in lines[1]], [x[1] for x in lines[1]], [x[0] for x in lines[2]], [x[1] for x in lines[2]])
-plt.axis([0, IMAGE_WIDTH, 0, IMAGE_HEIGHT])
-plt.gca().invert_yaxis()
-plt.show()
+cv2.imwrite('test.jpg', matrix)
+# plt.plot([x[0] for x in lines[0]], [x[1] for x in lines[0]], [x[0] for x in lines[1]], [x[1] for x in lines[1]], [x[0] for x in lines[2]], [x[1] for x in lines[2]])
+# plt.axis([0, IMAGE_WIDTH, 0, IMAGE_HEIGHT])
+# plt.gca().invert_yaxis()
+# plt.show()
 # f = open('f00000matrix.txt', 'w')
 # for row in matrix:
 #     f.write(str(row) + '\n')
