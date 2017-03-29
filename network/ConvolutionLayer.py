@@ -1,5 +1,6 @@
 from network.Neuron import Neuron
-from network.Neuron import WeightedNeuron
+from network.WeightedNeuron import WeightedNeuron
+from network.Neuron import Neuron
 from network.NeuralLayer import NeuralLayer
 from network.Matrix import Matrix
 from network import constants

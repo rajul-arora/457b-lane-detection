@@ -5,7 +5,7 @@ import os
 import sys
 from network.Neuron import Neuron
 from network.NeuralLayer import NeuralLayer
-from network.CustomLayers import ConvolutionLayer
+from network.ConvolutionLayer import ConvolutionLayer
 from network.Network import Network
 from network.Matrix import Matrix
 from network import constants

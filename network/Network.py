@@ -1,7 +1,7 @@
 from network.NeuralLayer import NeuralLayer
-from network.CustomLayers import FullyConnectedLayer
-from network.CustomLayers import InputLayer
-from network.CustomLayers import OutputLayer
+from network.FullyConnectedLayer import FullyConnectedLayer
+from network.InputLayer import InputLayer
+from network.OutputLayer import OutputLayer
 from network.Matrix import Matrix
 from network import constants
 
