@@ -1,3 +1,5 @@
+package Ported;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +16,7 @@ class Network {
         this.midFCL = new FullyConnectedLayer(Utils.sigmoid, 9);
         this.finalFCL = new FullyConnectedLayer(Utils.sigmoid, 2);
     }
-    // this.outputLayer = OutputLayer([4, 3])
+    // this.outputLayer = Ported.OutputLayer([4, 3])
 
     private boolean run(Matrix<Integer> input) {
 

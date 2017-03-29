@@ -1,5 +1,6 @@
+package Ported;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 
 class Matrix<T> implements Iterable {
@@ -69,9 +70,9 @@ class Matrix<T> implements Iterable {
         vector.toArray(array);
     }
 
-//    public Matrix multiply(double val) {
+//    public Ported.Matrix multiply(double val) {
 //
-//        Matrix m = new Matrix(this.size());
+//        Ported.Matrix m = new Ported.Matrix(this.size());
 //        for (int y = 0; y < this.height(); y++) {
 //            for (int x = 0; x < this.width(); x++) {
 //                m.set(y, x, (int) (this.get(y, x) * val));
@@ -96,7 +97,7 @@ class Matrix<T> implements Iterable {
     public String toString() {
 
         String size = this.width + ", " + this.height;
-        String output = "Matrix <" + size + "> [\n";
+        String output = "Ported.Matrix <" + size + "> [\n";
         for (ArrayList<T> row : this.data) {
             for (T val : row) {
                 output += val + ", ";

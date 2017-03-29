@@ -1,4 +1,4 @@
-from network.Neuron import Neuron
+package Ported;from network.Neuron import Neuron
 from network.WeightedNeuron import WeightedNeuron
 from network.NeuralLayer import NeuralLayer
 from network.Matrix import Matrix
