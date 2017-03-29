@@ -7,8 +7,13 @@ from network.Neuron import Neuron
 from network.NeuralLayer import NeuralLayer
 from network.CustomLayers import ConvolutionLayer
 from network.Network import Network
+from keras.optimizers import SGD
 from network.Matrix import Matrix
 from network import constants
+from keras.models import Sequential
+from keras.layers import Reshape
+from keras.layers import Dense, Activation
+from keras.applications.vgg19 import VGG19
 
 def pool(input: Matrix):
     """
@@ -103,6 +108,15 @@ def getInputAndOutputMatrices():
     for file in files:
         yield getPixelMatrices(dir, file)
 
+def generateTrainTestDataSets():
+    inputOutputIterator = getInputAndOutputMatrices()
+    train = []
+    test = []
+
+    for img, output_matrix in inputOutputIterator:
+        train.append(img)
+        test.append(output_matrix)
+    return (train, test)
 
 def getPixelMatrices(dir, file):
     img = cv2.imread(dir + file)
@@ -137,7 +151,6 @@ def main():
     # image = [[0 for x in range(16) ] for y in range(16)]
 
 
-
     # image = Matrix([16, 16])
     # for i in range(16):
     #     image[15 - i][i] = 1
@@ -145,22 +158,50 @@ def main():
     # input = image
     # print (str(input))
 
-    inputOutputIterator = getInputAndOutputMatrices()
-    partialInputOutputMatrices = []
-    for wholeImg, output_matrix in inputOutputIterator:
-        partialInputImages = blockshaped(wholeImg, constants.PARTIAL_IN_IMG_DIM[0], constants.PARTIAL_IN_IMG_DIM[1])
-        partialOutputMatrices = blockshaped(output_matrix, constants.PARTIAL_IN_IMG_DIM[0], constants.PARTIAL_IN_IMG_DIM[1])
-        for i in range(len(partialInputImages)):
-            partialInputOutputMatrices.append((Matrix.convert(partialInputImages[i]), Matrix.convert(partialOutputMatrices[i])))
+    print("[INFO]: Generating Data Sets from input images and output matrices.")
 
-    convLayer = ConvolutionLayer(activation = constants.relu)
-    # activLayer = NeuralLayer(constants.sigmoid)
-    poolLayer = NeuralLayer(func = pool)
+    (train, test) = generateTrainTestDataSets()
 
-    layers = [convLayer, poolLayer]
-    network = Network(layers)
+    print("[INFO]: Generating Input Feature Models.")
+
+
+    x_train = []
+    model = VGG19(weights='imagenet', include_top=False, pooling='max')
+    image = np.expand_dims(train[0], axis=0)
+    x = model.predict(image)
+    y = test[0]
+
+    network = Sequential()
+    output = np.reshape(y, (1, 307200))
+
+    network.add(Dense(512, input_dim=512))
+    network.add(Dense(307200, activation='sigmoid'))
+    network.add(Reshape((1, 307200)))
+
+    sgd = SGD(lr=0.1)
+    network.compile(loss='mean_squared_error', optimizer=sgd)
+    result = network.fit(x, output, epochs=100)
+
+    # for t in train:
+    #     image = np.expand_dims(t, axis=0)
+    #     x_train.append(model.predict(image))
+
+
+    # inputOutputIterator = getInputAndOutputMatrices()
+    # partialInputOutputMatrices = []
+    # for wholeImg, output_matrix in inputOutputIterator:
+        # partialInputImages = blockshaped(wholeImg, constants.PARTIAL_IN_IMG_DIM[0], constants.PARTIAL_IN_IMG_DIM[1])
+        # partialOutputMatrices = blockshaped(output_matrix, constants.PARTIAL_IN_IMG_DIM[0], constants.PARTIAL_IN_IMG_DIM[1])
+        # for i in range(len(partialInputImages)):
+        #     partialInputOutputMatrices.append((Matrix.convert(partialInputImages[i]), Matrix.convert(partialOutputMatrices[i])))
+
+    # convLayer = ConvolutionLayer(activation = constants.relu)
+    # # activLayer = NeuralLayer(constants.sigmoid)
+    # poolLayer = NeuralLayer(func = pool)
+    #
+    # layers = [convLayer, poolLayer]
+    # network = Network(layers)
     #network.train(partialInputImagesAsMatrices[0], [1, 0]) #Just try the first input image segment for now
-
 
 
 
