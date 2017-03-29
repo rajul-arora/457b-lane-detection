@@ -1,40 +1,49 @@
-from network.Matrix import Matrix
-from network import constants
-import random
+import java.util.*;
+import java.util.concurrent.Callable;
 
-class Neuron:
+class Neuron {
 
-    def __init__(self, func, activation = None, numForwardNeurons=1):
-        self.func = func
-        self.activation = activation
-        self.previousInput = None
-        self.numForwardNeurons = numForwardNeurons
-        self.prevResult = [0 for i in range(numForwardNeurons)]
-        self.currentValue = None
+    protected Callable<Object> func;
+    protected Callable<Object> activation;
+    protected Object previousInput;
+    protected int numForwardNeurons;
+    protected final Object[] prevResult;
+    protected Object currentValue;
 
-    def process(self, input):
-        self.previousInput = input
+    public Neuron(Callable<Object> func) {
+        this(func, null);
+    }
 
-        value = self.callFunc(input)
-        if self.activation is not None:
-            value = self.activation(value)
+    public Neuron(Callable<Object> func, Callable<Object> activation) {
+        this(func, activation, 1);
+    }
 
-        self.currentValue = value
-        return value
+    public Neuron(Callable<Object> func, Callable<Object> activation, int numForwardNeurons) {
+        this.func = func;
+        this.activation = activation;
+        this.previousInput = null;
+        this.numForwardNeurons = numForwardNeurons
+        this.prevResult = new Object[numForwardNeurons];
+        this.currentValue = null;
+    }
 
+    public Object process(Object input) {
+        this.previousInput = input;
 
-        # result = [0 for i in range(self.numForwardNeurons)]
-        # for i in range(self.numForwardNeurons):
-        #     result[i] = self.callFunc(input)
-        #     if self.activation is not None:
-        #         result = self.activation(result)
-        #
-        #     self.prevResult[i] = result[i]
-        #
-        # return result
+        Object value = this.callFunc(input);
+        if (this.activation != null) {
+            value = this.activation.call()(value);
+        }
 
-    def adjustWeights(self, deltas):
-        pass
+        this.currentValue = value;
+        return value;
+    }
 
-    def callFunc(self, input):
-        return self.func(input)
+    protected void adjustWeights(List<Double> deltas) {
+
+    }
+
+    protected Object callFunc(Object input) {
+        return this.func.call(input);
+    }
+}

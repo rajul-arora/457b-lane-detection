@@ -1,93 +1,109 @@
-from network.NeuralLayer import NeuralLayer
-from network.FullyConnectedLayer import FullyConnectedLayer
-from network.InputLayer import InputLayer
-from network.OutputLayer import OutputLayer
-from network.Matrix import Matrix
-from network import constants
+import java.util.ArrayList;
+import java.util.List;
 
-class Network:
-    def __init__(self, layers):
-        self.layers = layers
-        self.inputLayer = InputLayer(None, neuronCount = 1)
-        self.midFCL =  FullyConnectedLayer(activation = constants.sigmoid, neuronCount = 9)
-        self.finalFCL = FullyConnectedLayer(activation = constants.sigmoid, neuronCount = 2)
-        # self.outputLayer = OutputLayer([4, 3])
-    
-    def run(self, input: Matrix):
-        data = self.inputLayer.process(input)
-        for layer in self.layers:
-            data = layer.process(data)
+class Network {
 
-        data = self.finalFCL.process(data)
-        outputs = self.outputLayer.process(data)
+    private final List<NeuralLayer> layers;
+    private final InputLayer inputLayer;
+    private final FullyConnectedLayer midFCL;
+    private final FullyConnectedLayer finalFCL;
 
-        # Return your decision based on the vote
-        return 1 if outputs[0] > outputs[1] else 0
+    public Network(List<NeuralLayer> layers) {
+        this.layers = layers;
+        this.inputLayer = new InputLayer(null, 1);
+        this.midFCL = new FullyConnectedLayer(Utils.sigmoid, 9);
+        this.finalFCL = new FullyConnectedLayer(Utils.sigmoid, 2);
+    }
+    // this.outputLayer = OutputLayer([4, 3])
 
-    def train(self, input: Matrix, expectedOutput):        
+    private boolean run(Matrix<Integer> input) {
 
-        error = 0
-        running = True
+        List<Object> data = this.inputLayer.process(input);
+        for (NeuralLayer layer :this.layers){
+            data = layer.process(data);
+        }
 
-        while running:           
-            data = self.inputLayer.process(input)
+        data = this.midFCL.process(data);
+        List<Double> outputs = this.finalFCL.process(data);
+//        List<Double> outputs = this.outputLayer.process(data);
 
-            for layer in self.layers:
-                data = layer.process(data)
+        // Return your decision based on the vote
+        return outputs.get(0) > outputs.get(1);
+    }
 
-            midOutput = self.midFCL.process(data)
-            output = self.finalFCL.process([Matrix.convert([midOutput])])
-            # outputs = self.outputLayer.process(data)
-            error = self.calculateLoss(output, expectedOutput)
-            running = error > constants.EPSILON
+    private void train(Matrix<Integer> input, List<Double> expectedOutput) {
 
-            assert (len(output) == len(expectedOutput))
-            if running:
-                initialDeltas = [0 for i in range(len(output))]
-                for i in range(0, len(output)):
-                    initialDeltas[i] = expectedOutput[i] - output[i]
+        double error = 0;
+        boolean running = true;
 
-                deltas = self.finalFCL.calculateDeltas(initialDeltas)
-                deltas = self.midFCL.calculateDeltas(deltas)
-                for layer in reversed(self.layers):
-                    layer.adjustWeights(deltas)
-                    deltas = layer.calculateDeltas(deltas)
+        while running {
+            data = this.inputLayer.process(input)
 
-            print ("Output dim: " + str(data[0].size()) + " Error " + str(error))
-            # import pdb;pdb.set_trace()
+            for (NeuralLayer layer : this.layers) {
+                data = layer.process(data);
+            }
 
-        print ("Final Outputs: " + str(output))
-        print("\n\nHooray!!! we're done! Final Error: " + str(error));
+            List<Object> midOutput = this.midFCL.process(data);
 
-    
-    def calculateLoss(self, output, expectedOutput):
-        return self.mse(output, expectedOutput)
+            ArrayList<List<Object>> innerlist = new ArrayList<>();
+            innerlist.append(midOUtput);
+            ArrayList<Matrix<Object>> list = new ArrayList<>();
+            list.append(Matrix < Object >.convert(innerlist));
 
-    @staticmethod
-    def mse(output, expectedOutput):
-        """
-        Mean Squared Error
-        """
-        assert len(output) == len(expectedOutput)
+            List<Object> output = this.finalFCL.process(list);
+            // outputs = this.outputLayer.process(data);
+            double error = this.calculateLoss(output, expectedOutput);
+            running = error > Utils.EPSILON;
 
-        result = 0
-        for i in range(len(output)):
-            result += (expectedOutput[i] - output[i]) ** 2
+//            assert (len(output) == len(expectedOutput))
+            if (running) {
+                List<Double> initialDeltas = new ArrayList<>(output.size());
+                for (int i = 0; i < len(output); i++) {
+                    initialDeltas.add(expectedOutput[i] - output[i]);
+                }
 
-        return result/2
+                List<Double> deltas = this.finalFCL.calculateDeltas(initialDeltas);
+                deltas = this.midFCL.calculateDeltas(deltas);
+                for (int i = this.layers.size() - 1; i >= 0; i++) {
+                    NeuralLayer layer = this.layers.get(i);
+                    layer.adjustWeights(deltas);
+                    deltas = layer.calculateDeltas(deltas);
+                }
+            }
 
-    def sum(output, expectedOutput):        
-        assert len(output) == len(expectedOutput)
+            System.out.println("Output dim: " + str(data[0].size()) + " Error " + str(error));
+        }
 
-        result = 0
-        for i in range(len(output)):
-            result += abs(expectedOutput[i] - output[i])
+        System.out.println("Final Outputs: " + str(output));
+        System.out.println("\n\nHooray!!! we're done! Final Error: " + str(error));
+    }
 
-        return result
-        
+    private double calculateLoss(this,List<Double> output, List<Double> expectedOutput) {
+        return this.mse(output, expectedOutput);
+    }
 
-    def inputFunction(input):
-        """
-        Simply just passes the inputs through
-        """
-        return input
+    /**
+     * Mean Squared Error
+     */
+    private double mse(List<Double> output, List<Double> expectedOutput) {
+//        assert len(output) == len(expectedOutput)
+
+        double result = 0;
+        for (int i = 0; i < output.size(); i++) {
+            result += Math.pow(expectedOutput.get(i) - output.get(i), 2);
+        }
+
+        return result / 2;
+    }
+
+    private double sum(List<Double> output, List<Double> expectedOutput) {
+//        assert len(output) == len(expectedOutput)
+
+        double result = 0;
+        for (int i = 0; i < output.size(); i++) {
+            result += Math.abs(expectedOutput.get(i) - output.get(i));
+        }
+
+        return result;
+    }
+}

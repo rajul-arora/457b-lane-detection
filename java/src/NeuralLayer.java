@@ -1,46 +1,71 @@
-from network.Neuron import Neuron
-from network.Matrix import Matrix
-from network import constants
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
 
-class NeuralLayer:
-    
-    def __init__(self, func, activation = None, neuronCount = constants.NEURON_COUNT, numForwardNeurons=1):
-        self.neurons = [ self.createNueron(func, activation) for i in range(0, neuronCount) ]
-        self.numForwardNeurons = numForwardNeurons
-    
-    def createNueron(self, func, activation, numForwardNeurons):
-        return Neuron(func, activation, numForwardNeurons)
+class NeuralLayer implements Layer {
 
-    def setError(self, error):
-        for neuron in self.neurons:
-            neuron.setError(error)
+    private final List<Neuron> neurons;
+    private final int numForwardNeurons;
 
-    def calculateDeltas(self, deltas):
-        return deltas
+    public NeuralLayer(Callable<Object> func) {
+        this(func, null);
+    }
 
-    def adjustWeights(self, deltas):
-        """"
-        Adjusts the weights using the values of delta propagated to it.
-        """
-        for neuron in self.neurons:
-            neuron.adjustWeights(deltas)
+    public NeuralLayer(Callable<Object> func, Callable<Object> activation) {
+        this(func, activation, Utils.NEURON_COUNT);
+    }
 
-    def process(self, inputs):
-        """
-        Passes the inputs to their corresponding neuron.
-        That is, input[i] -> neuron[i]
-        """
-        assert len(inputs) == len(self.neurons)
+    public NeuralLayer(Callable<Object> func, Callable<Object> activation, int neuronCount) {
+        this(func, activation, Utils.NEURON_COUNT, 1);
+    }
 
-        outputs = []
-        for i in range(len(inputs)):
-            neuron = self.neurons[i]
+    public NeuralLayer(Callable<Object> func, Callable<Object> activation, int neuronCount, int numForwardNeurons) {
+        this.neurons = new ArrayList<>();
+        for (int i = 0; i < neuronCount; i++) {
+            this.neurons.add(this.createNueron(func, activation, numForwardNeurons));
+        }
 
-            # Process each neuron with the corresponding input
-            result = neuron.process(inputs[i])
-            outputs.append(result)
-        
-        
-        # print("Input to layer(" + str(self) + "): " + str(inputs))
-        # print("Output from layer(" + str(self) + "): " + str(outputs))
-        return outputs
+        this.numForwardNeurons = numForwardNeurons;
+    }
+
+    protected Neuron createNueron(Callable<Object> func, Callable<Object> activation, int numForwardNeurons) {
+        return new Neuron(func, activation, numForwardNeurons);
+    }
+
+
+    public List<Double> calculateDeltas(List<Double> deltas) {
+        return deltas;
+    }
+
+    /**
+     * Adjusts the weights using the values of delta propagated to it.
+     */
+    public void adjustWeights(List<Double> deltas) {
+
+        for (Neuron neuron : this.neurons) {
+            neuron.adjustWeights(deltas);
+        }
+    }
+
+    /**
+     * Passes the inputs to their corresponding neuron.
+     * That is, input[i] -> neuron[i]
+     */
+    public List<Object> process(List<Object> inputs) {
+
+//        assert len(inputs) == len(this.neurons)
+
+        List<Object> outputs = new ArrayList<>();
+        for (int i = 0; i < inputs.size(); i++) {
+            Neuron neuron = this.neurons.get(i);
+
+            // Process each neuron with the corresponding input
+            Object result = neuron.process(inputs.get(i));
+            outputs.add(result);
+        }
+
+        // print("Input to layer(" + str(this) + "): " + str(inputs))
+        // print("Output from layer(" + str(this) + "): " + str(outputs))
+        return outputs;
+    }
+}
