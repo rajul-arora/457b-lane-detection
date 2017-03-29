@@ -7,6 +7,8 @@ from network.Neuron import Neuron
 from network.NeuralLayer import NeuralLayer
 from network.CustomLayers import ConvolutionLayer
 from network.Network import Network
+from keras.models import Model
+from keras.layers import Input, Dense, Conv2D, MaxPooling2D, UpSampling2D
 from keras.optimizers import SGD
 from network.Matrix import Matrix
 from network import constants
@@ -14,6 +16,7 @@ from keras.models import Sequential
 from keras.layers import Reshape
 from keras.layers import Dense, Activation
 from keras.applications.vgg19 import VGG19
+import itertools
 
 def pool(input: Matrix):
     """
@@ -113,9 +116,11 @@ def generateTrainTestDataSets():
     train = []
     test = []
 
-    for img, output_matrix in inputOutputIterator:
-        train.append(img)
-        test.append(output_matrix)
+    for img, output_matrix in itertools.islice(inputOutputIterator, 10):
+        newImg = np.expand_dims(img, axis=2)
+        train.append(newImg)
+        new_output_matrix = np.expand_dims(output_matrix, axis=2)
+        test.append(new_output_matrix)
     return (train, test)
 
 def getPixelMatrices(dir, file):
@@ -158,33 +163,51 @@ def main():
     # input = image
     # print (str(input))
 
-    print("[INFO]: Generating Data Sets from input images and output matrices.")
+    # datasetIterator = getInputAndOutputMatrices()
 
-    (train, test) = generateTrainTestDataSets()
+    (train_data, test_data) = generateTrainTestDataSets()
 
     print("[INFO]: Generating Input Feature Models.")
 
+    # for i in range(0,10):
+        # t = train[i]
 
-    x_train = []
-    model = VGG19(weights='imagenet', include_top=False, pooling='max')
-    image = np.expand_dims(train[0], axis=0)
-    x = model.predict(image)
-    y = test[0]
+    # model = VGG19(weights='imagenet', include_top=False)
+    # x_train = []
+    # x_test = []
+    # shape = None
+    # for img, test in itertools.islice(datasetIterator, 10):
+    #     res = model.predict(np.array([img]))[0]
+    #     x_train.append(res)
+    #     x_test.append(test)
+    #     shape = res.shape
+    #
+    # print(shape)
+    # npArray = np.array(x_test)
+    # testData = npArray.transpose().swapaxes(0, 1)
+    # input = Input(shape=shape)
 
-    network = Sequential()
-    output = np.reshape(y, (1, 307200))
+    input_img = Input(shape=(480, 640, 1))  # adapt this if using `channels_first` image data format
 
-    network.add(Dense(512, input_dim=512))
-    network.add(Dense(307200, activation='sigmoid'))
-    network.add(Reshape((1, 307200)))
+    x = Conv2D(16, (3, 3), activation='relu', padding='same', data_format='channels_last')(input_img)
+    x = MaxPooling2D((2, 2), padding='same')(x)
+    x = Conv2D(8, (3, 3), activation='relu', padding='same', data_format='channels_last')(x)
+    x = MaxPooling2D((2, 2), padding='same')(x)
+    x = Conv2D(8, (3, 3), activation='relu', padding='same', data_format='channels_last')(x)
+    encoded = MaxPooling2D((2, 2), padding='same')(x)
 
-    sgd = SGD(lr=0.1)
-    network.compile(loss='mean_squared_error', optimizer=sgd)
-    result = network.fit(x, output, epochs=100)
-
-    # for t in train:
-    #     image = np.expand_dims(t, axis=0)
-    #     x_train.append(model.predict(image))
+    x = Conv2D(8, (3, 3), activation='relu', padding='same', data_format='channels_last')(encoded)
+    x = UpSampling2D((2, 2))(x)
+    x = Conv2D(8, (3, 3), activation='relu', padding='same', data_format='channels_last')(x)
+    x = UpSampling2D((2, 2))(x)
+    x = Conv2D(16, (3, 3), activation='relu', padding='same', data_format='channels_last')(x)
+    x = UpSampling2D((2, 2))(x)
+    decoded = Conv2D(1, (3, 3), activation='sigmoid', padding='same', data_format='channels_last')(x)
+    autoencoder = Model(input_img, decoded)
+    autoencoder.summary()
+    autoencoder.compile(optimizer='adam', loss='binary_crossentropy')
+    result = autoencoder.fit(np.array(train_data), np.array(test_data), epochs=1)
+    guess = autoencoder.predict(np.expand_dims(train_data[0], axis=0))
 
 
     # inputOutputIterator = getInputAndOutputMatrices()
