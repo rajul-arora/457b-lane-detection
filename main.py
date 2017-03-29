@@ -175,8 +175,8 @@ def main():
     output = np.reshape(y, (1, 307200))
 
     network.add(Dense(512, input_dim=512))
-    network.add(Dense(307200, activation='sigmoid'))
-    network.add(Reshape((1, 307200)))
+    network.add(Dense(512, activation='sigmoid'))
+    network.add(Dense(307200))
 
     sgd = SGD(lr=0.1)
     network.compile(loss='mean_squared_error', optimizer=sgd)
