@@ -7,6 +7,8 @@ from network.Neuron import Neuron
 from network.NeuralLayer import NeuralLayer
 from network.CustomLayers import ConvolutionLayer
 from network.Network import Network
+from keras.models import Model
+from keras.layers import Input, Dense, Conv2D, MaxPooling2D, UpSampling2D
 from keras.optimizers import SGD
 from network.Matrix import Matrix
 from network import constants
@@ -14,6 +16,7 @@ from keras.models import Sequential
 from keras.layers import Reshape
 from keras.layers import Dense, Activation
 from keras.applications.vgg19 import VGG19
+import itertools
 
 def pool(input: Matrix):
     """
@@ -158,29 +161,51 @@ def main():
     # input = image
     # print (str(input))
 
-    print("[INFO]: Generating Data Sets from input images and output matrices.")
-
-    (train, test) = generateTrainTestDataSets()
+    datasetIterator = getInputAndOutputMatrices()
 
     print("[INFO]: Generating Input Feature Models.")
 
+    # for i in range(0,10):
+        # t = train[i]
 
+    model = VGG19(weights='imagenet', include_top=False)
     x_train = []
-    model = VGG19(weights='imagenet', include_top=False, pooling='max')
-    image = np.expand_dims(train[0], axis=0)
-    x = model.predict(image)
-    y = test[0]
+    x_test = []
+    shape = None
+    for img, test in itertools.islice(datasetIterator, 10):
+        res = model.predict(np.array([img]))[0]
+        x_train.append(res)
+        x_test.append(test)
+        shape = res.shape
 
-    network = Sequential()
-    output = np.reshape(y, (1, 307200))
+    print(shape)
+    npArray = np.array(x_test)
+    testData = npArray.transpose().swapaxes(0, 1)
+    input = Input(shape=shape)
 
-    network.add(Dense(512, input_dim=512))
-    network.add(Dense(512, activation='sigmoid'))
-    network.add(Dense(307200))
+    x = Conv2D(8, (3, 3), activation='relu', padding='same', data_format='channels_last')(input)
+    x = UpSampling2D((2, 2))(x)
+    x = Conv2D(8, (3, 3), activation='relu', padding='same', data_format='channels_last')(x)
+    x = UpSampling2D((2, 2))(x)
+    x = Conv2D(16, (3, 3), activation='relu')(x)
+    x = UpSampling2D((2, 2))(x)
+    decoded = Conv2D(1, (3, 3), activation='sigmoid', padding='same', data_format='channels_last')(x)
+    autoencoder = Model(input, decoded)
+    autoencoder.compile(optimizer='adadelta', loss='binary_crossentropy')
+    result = autoencoder.fit(np.array(x_train), testData, epochs=10)
 
-    sgd = SGD(lr=0.1)
-    network.compile(loss='mean_squared_error', optimizer=sgd)
-    result = network.fit(x, output, epochs=100)
+        # network = Sequential()
+    # network.add(Conv2D(32, (16, 16), activation='relu', padding='same'))
+    # network.add(UpSampling2D((2, 2)))
+    # network.add(Conv2D(32, (16, 16), activation='relu', padding='same'))
+    # network.add(UpSampling2D((2, 2)))
+    # network.add(Conv2D(64, (16, 16), activation='relu', padding='same'))
+    # network.add(UpSampling2D((2, 2)))
+    # network.add(Conv2D(1, (16, 16), activation='sigmoid', padding='same'))
+    #
+    # network.compile(loss='mean_squared_error', optimizer='adadelta')
+    # result = network.fit(np.array(x_train), np.array(x_test), epochs=10)
+
 
     # for t in train:
     #     image = np.expand_dims(t, axis=0)
