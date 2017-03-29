@@ -1,6 +1,6 @@
 import math
 import cv2
-import numpy
+import numpy as np
 import os
 import sys
 from network.Neuron import Neuron
@@ -96,18 +96,22 @@ def testFullyConnected():
     print(fullyConnectedFunction([m1,m2]))
 
 
-def getImagePixelMatrices():
-    dir = "./lane_images/cordova1/"
+def getInputAndOutputMatrices():
+    dir = "./lane_images/cordova1_images/"
     files = os.listdir(dir)
 
     for file in files:
-        return getPixelMatrix(dir, file)
+        yield getPixelMatrices(dir, file)
 
-def getPixelMatrix(dir, file):
+
+def getPixelMatrices(dir, file):
     img = cv2.imread(dir + file)
+    output_filename = file.split('.')[0] + 'matrix.txt'
     if constants.GREYSCALE:
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    return img
+    output_matrix = np.fromfile(constants.OUTPUT_DIRECTORY + output_filename, sep=" ").reshape(constants.IMAGE_HEIGHT, constants.IMAGE_WIDTH)
+    return img, output_matrix
+
 
 def blockshaped(arr, nrows, ncols):
     """
@@ -121,6 +125,7 @@ def blockshaped(arr, nrows, ncols):
     return (arr.reshape(h//nrows, nrows, -1, ncols)
                .swapaxes(1,2)
                .reshape(-1, nrows, ncols))
+
 
 def main():
 
@@ -140,11 +145,13 @@ def main():
     # input = image
     # print (str(input))
 
-    wholeInputImage = getImagePixelMatrices()
-    partialInputImages = blockshaped(wholeInputImage, constants.PARTIAL_IN_IMG_DIM[0], constants.PARTIAL_IN_IMG_DIM[1])
-    partialInputImagesAsMatrices = []
-    for i in range(len(partialInputImages)):
-        partialInputImagesAsMatrices.append(Matrix.convert(partialInputImages[i]))
+    inputOutputIterator = getInputAndOutputMatrices()
+    partialInputOutputMatrices = []
+    for wholeImg, output_matrix in inputOutputIterator:
+        partialInputImages = blockshaped(wholeImg, constants.PARTIAL_IN_IMG_DIM[0], constants.PARTIAL_IN_IMG_DIM[1])
+        partialOutputMatrices = blockshaped(output_matrix, constants.PARTIAL_IN_IMG_DIM[0], constants.PARTIAL_IN_IMG_DIM[1])
+        for i in range(len(partialInputImages)):
+            partialInputOutputMatrices.append((Matrix.convert(partialInputImages[i]), Matrix.convert(partialOutputMatrices[i])))
 
     convLayer = ConvolutionLayer(activation = constants.relu)
     # activLayer = NeuralLayer(constants.sigmoid)
@@ -152,7 +159,7 @@ def main():
 
     layers = [convLayer, poolLayer]
     network = Network(layers)
-    network.train(partialInputImagesAsMatrices[0], [1, 0]) #Just try the first input image segment for now
+    #network.train(partialInputImagesAsMatrices[0], [1, 0]) #Just try the first input image segment for now
 
 
 
