@@ -38,7 +38,6 @@ class ConvolutionLayer(NeuralLayer):
                         sum += input[x+i][y+j] * feature[x][y]
 
                 output[i][j] = sum / denom
-
         return output
 
 class FullyConnectedLayer(NeuralLayer):

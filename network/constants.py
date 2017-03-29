@@ -4,6 +4,11 @@ import math
 NEURON_COUNT = 3
 EPSILON = 0.1
 LEARNING_RATE = 0.1
+GREYSCALE = True
+PARTIAL_IN_IMG_DIM = [32, 32]
+OUTPUT_DIRECTORY = './lane_images/cordova1_output_matrices/'
+IMAGE_WIDTH = 640
+IMAGE_HEIGHT = 480
 
 
 def adeline(input: Matrix, error, weights: Matrix):
