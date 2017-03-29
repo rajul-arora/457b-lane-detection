@@ -2,31 +2,56 @@ from network.Neuron import Neuron
 from network.WeightedNeuron import WeightedNeuron
 from network.Neuron import Neuron
 from network.NeuralLayer import NeuralLayer
+from network.Filter import Filter
 from network.Matrix import Matrix
 from network import constants
 import math
 
-class ConvolutionLayer(NeuralLayer):
+class ConvolutionLayer:
     
-    def __init__(self, activation, neuronsPerFilter = 9):
+    def __init__(self, activation, numFilters = 3, neuronsPerFilter = 9):
         size = math.ceil(math.sqrt(neuronsPerFilter))
         self.weightsDim = [size, size]
-        super(ConvolutionLayer, self).__init__(self.convolve, activation)
-            
-    def createNueron(self, func, activation):
-        return WeightedNeuron(func = func, activation = activation, weightsDim = self.weightsDim)
+        self.filters = [ Filter(activation, neuronsPerFilter) for i in range(0, numFilters) ]
 
     def calculateDeltas(self, prevDeltas): 
         """
         Calculates the delta for the given output and expected output.
         """
-        assert len(prevDeltas) == len(self.nuerons)
-        
-        deltas = []
-        for i in range(0, len(prevDeltas)):
-            delta = constants.sigderiv(self.neurons[i].prevResult) * prevDeltas[i]
-            deltas.append(delta)
-        return deltas 
+        pass
+        # assert len(prevDeltas) == len(self.filters)
+        #
+        # deltas = []
+        # for i in range(0, len(prevDeltas)):
+        #     delta = constants.sigderiv(self.filters[i].prevResult) * prevDeltas[i]
+        #     deltas.append(delta)
+        # return deltas
+
+    def adjustWeights(self, deltas):
+        """"
+        Adjusts the weights using the values of delta propagated to it.
+        """
+        for filter in self.filters:
+            filter.adjustNeuronWeights(deltas)
+
+    def process(self, inputs):
+        """
+        Passes the inputs to their corresponding neuron.
+        That is, input[i] -> neuron[i]
+        """
+        assert len(inputs) == len(self.filters)
+
+        outputs = []
+        for i in range(len(inputs)):
+            filter = self.filters[i]
+
+            # Process each neuron with the corresponding input
+            result = filter.process(inputs[i])
+            outputs.append(result)
+
+        # print("Input to layer(" + str(self) + "): " + str(inputs))
+        # print("Output from layer(" + str(self) + "): " + str(outputs))
+        return outputs
 
     @staticmethod
     def convolve(input: Matrix, feature: Matrix):

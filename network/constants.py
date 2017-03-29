@@ -54,3 +54,6 @@ def dReLU(X: Matrix):
             output[i][j] = 1 if X[i][j] > 0 else 0
 
     return output
+
+def multiply(x, y):
+    return x*y

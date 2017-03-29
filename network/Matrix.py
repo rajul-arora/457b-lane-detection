@@ -25,6 +25,14 @@ class Matrix:
 
         return matrix
 
+    def flatten(self):
+        vector = []
+        for y in range(self.height()):
+            for x in range(self.width()):
+                vector.append(self.data[y][x])
+        return vector
+
+
     def toJaggedArray(self):
         return self.data
 
@@ -36,6 +44,16 @@ class Matrix:
 
     def __setitem__(self, key, value):
         self.data[key] = value
+
+    def __mul__(self, other):
+        return self.__rmul__(other)
+
+    def __rmul__(self, other):
+        m = Matrix(self.size())
+        for y in range(0, self.height()):
+            for x in range(0, self.width()):
+                m[y][x] = self.data[y][x] * other
+        return m
 
     def __iter__(self):
         return self.data.__iter__

@@ -138,32 +138,29 @@ def main():
 
 
 
-    # image = Matrix([16, 16])
-    # for i in range(16):
-    #     image[15 - i][i] = 1
-    #
-    # input = image
-    # print (str(input))
+    image = Matrix([16, 16])
+    for i in range(16):
+        image[15 - i][i] = 1
 
-    inputOutputIterator = getInputAndOutputMatrices()
-    partialInputOutputMatrices = []
-    for wholeImg, output_matrix in inputOutputIterator:
-        partialInputImages = blockshaped(wholeImg, constants.PARTIAL_IN_IMG_DIM[0], constants.PARTIAL_IN_IMG_DIM[1])
-        partialOutputMatrices = blockshaped(output_matrix, constants.PARTIAL_IN_IMG_DIM[0], constants.PARTIAL_IN_IMG_DIM[1])
-        for i in range(len(partialInputImages)):
-            partialInputOutputMatrices.append((Matrix.convert(partialInputImages[i]), Matrix.convert(partialOutputMatrices[i])))
+    input = image
+    print (str(input))
 
-    convLayer = ConvolutionLayer(activation = constants.ReLU)
+    # inputOutputIterator = getInputAndOutputMatrices()
+    # partialInputOutputMatrices = []
+    # for wholeImg, output_matrix in inputOutputIterator:
+    #     partialInputImages = blockshaped(wholeImg, constants.PARTIAL_IN_IMG_DIM[0], constants.PARTIAL_IN_IMG_DIM[1])
+    #     partialOutputMatrices = blockshaped(output_matrix, constants.PARTIAL_IN_IMG_DIM[0], constants.PARTIAL_IN_IMG_DIM[1])
+    #     for i in range(len(partialInputImages)):
+    #         partialInputOutputMatrices.append((Matrix.convert(partialInputImages[i]), Matrix.convert(partialOutputMatrices[i])))
+
+    convLayer = ConvolutionLayer(activation = constants.ReLU, numFilters=3, neuronsPerFilter=9)
     # activLayer = NeuralLayer(constants.sigmoid)
     poolLayer = NeuralLayer(func = pool)
 
     layers = [convLayer, poolLayer]
     network = Network(layers)
-    #network.train(partialInputImagesAsMatrices[0], [1, 0]) #Just try the first input image segment for now
-
-
-
-
+    # network.train(partialInputImagesAsMatrices[0], [1, 0]) #Just try the first input image segment for now
+    network.train(image,[1,0])
     test = Matrix([16, 16])
     offset = 1
     # Diagonalise the center

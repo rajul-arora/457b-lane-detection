@@ -9,6 +9,7 @@ class Network:
     def __init__(self, layers):
         self.layers = layers
         self.inputLayer = InputLayer(None, neuronCount = 1)
+        self.midFCL =  FullyConnectedLayer(activation = constants.sigmoid, neuronCount = 9)
         self.finalFCL = FullyConnectedLayer(activation = constants.sigmoid, neuronCount = 2)
         # self.outputLayer = OutputLayer([4, 3])
     
@@ -34,14 +35,20 @@ class Network:
             for layer in self.layers:
                 data = layer.process(data)
 
-            output = self.finalFCL.process(data)
+            midOutput = self.midFCL.process(data)
+            output = self.finalFCL.process([Matrix.convert([midOutput])])
             # outputs = self.outputLayer.process(data)
             error = self.calculateLoss(output, expectedOutput)
             running = error > constants.EPSILON
 
-            if running: 
-                import pdb;pdb.set_trace()
-                deltas = self.finalFCL.calculateDeltas(output, expectedOutput)
+            assert (len(output) == len(expectedOutput))
+            if running:
+                initialDeltas = [0 for i in range(len(output))]
+                for i in range(0, len(output)):
+                    initialDeltas[i] = expectedOutput[i] - output[i]
+
+                deltas = self.finalFCL.calculateDeltas(initialDeltas)
+                deltas = self.midFCL.calculateDeltas(deltas)
                 for layer in reversed(self.layers):
                     layer.adjustWeights(deltas)
                     deltas = layer.calculateDeltas(deltas)
