@@ -7,8 +7,16 @@ from network.Neuron import Neuron
 from network.NeuralLayer import NeuralLayer
 from network.CustomLayers import ConvolutionLayer
 from network.Network import Network
+from keras.models import Model
+from keras.layers import Input, Dense, Conv2D, MaxPooling2D, UpSampling2D
+from keras.optimizers import SGD
 from network.Matrix import Matrix
 from network import constants
+from keras.models import Sequential
+from keras.layers import Reshape
+from keras.layers import Dense, Activation
+from keras.applications.vgg19 import VGG19
+import itertools
 
 def pool(input: Matrix):
     """
@@ -103,6 +111,17 @@ def getInputAndOutputMatrices():
     for file in files:
         yield getPixelMatrices(dir, file)
 
+def generateTrainTestDataSets():
+    inputOutputIterator = getInputAndOutputMatrices()
+    train = []
+    test = []
+
+    for img, output_matrix in itertools.islice(inputOutputIterator, 10):
+        newImg = np.expand_dims(img, axis=2)
+        train.append(newImg)
+        new_output_matrix = np.expand_dims(output_matrix, axis=2)
+        test.append(new_output_matrix)
+    return (train, test)
 
 def getPixelMatrices(dir, file):
     img = cv2.imread(dir + file)
@@ -137,7 +156,6 @@ def main():
     # image = [[0 for x in range(16) ] for y in range(16)]
 
 
-
     # image = Matrix([16, 16])
     # for i in range(16):
     #     image[15 - i][i] = 1
@@ -145,22 +163,68 @@ def main():
     # input = image
     # print (str(input))
 
-    inputOutputIterator = getInputAndOutputMatrices()
-    partialInputOutputMatrices = []
-    for wholeImg, output_matrix in inputOutputIterator:
-        partialInputImages = blockshaped(wholeImg, constants.PARTIAL_IN_IMG_DIM[0], constants.PARTIAL_IN_IMG_DIM[1])
-        partialOutputMatrices = blockshaped(output_matrix, constants.PARTIAL_IN_IMG_DIM[0], constants.PARTIAL_IN_IMG_DIM[1])
-        for i in range(len(partialInputImages)):
-            partialInputOutputMatrices.append((Matrix.convert(partialInputImages[i]), Matrix.convert(partialOutputMatrices[i])))
+    # datasetIterator = getInputAndOutputMatrices()
 
-    convLayer = ConvolutionLayer(activation = constants.relu)
-    # activLayer = NeuralLayer(constants.sigmoid)
-    poolLayer = NeuralLayer(func = pool)
+    (train_data, test_data) = generateTrainTestDataSets()
 
-    layers = [convLayer, poolLayer]
-    network = Network(layers)
+    print("[INFO]: Generating Input Feature Models.")
+
+    # for i in range(0,10):
+        # t = train[i]
+
+    # model = VGG19(weights='imagenet', include_top=False)
+    # x_train = []
+    # x_test = []
+    # shape = None
+    # for img, test in itertools.islice(datasetIterator, 10):
+    #     res = model.predict(np.array([img]))[0]
+    #     x_train.append(res)
+    #     x_test.append(test)
+    #     shape = res.shape
+    #
+    # print(shape)
+    # npArray = np.array(x_test)
+    # testData = npArray.transpose().swapaxes(0, 1)
+    # input = Input(shape=shape)
+
+    input_img = Input(shape=(480, 640, 1))  # adapt this if using `channels_first` image data format
+
+    x = Conv2D(16, (3, 3), activation='relu', padding='same', data_format='channels_last')(input_img)
+    x = MaxPooling2D((2, 2), padding='same')(x)
+    x = Conv2D(8, (3, 3), activation='relu', padding='same', data_format='channels_last')(x)
+    x = MaxPooling2D((2, 2), padding='same')(x)
+    x = Conv2D(8, (3, 3), activation='relu', padding='same', data_format='channels_last')(x)
+    encoded = MaxPooling2D((2, 2), padding='same')(x)
+
+    x = Conv2D(8, (3, 3), activation='relu', padding='same', data_format='channels_last')(encoded)
+    x = UpSampling2D((2, 2))(x)
+    x = Conv2D(8, (3, 3), activation='relu', padding='same', data_format='channels_last')(x)
+    x = UpSampling2D((2, 2))(x)
+    x = Conv2D(16, (3, 3), activation='relu', padding='same', data_format='channels_last')(x)
+    x = UpSampling2D((2, 2))(x)
+    decoded = Conv2D(1, (3, 3), activation='sigmoid', padding='same', data_format='channels_last')(x)
+    autoencoder = Model(input_img, decoded)
+    autoencoder.summary()
+    autoencoder.compile(optimizer='adam', loss='binary_crossentropy')
+    result = autoencoder.fit(np.array(train_data), np.array(test_data), epochs=1)
+    guess = autoencoder.predict(np.expand_dims(train_data[0], axis=0))
+
+
+    # inputOutputIterator = getInputAndOutputMatrices()
+    # partialInputOutputMatrices = []
+    # for wholeImg, output_matrix in inputOutputIterator:
+        # partialInputImages = blockshaped(wholeImg, constants.PARTIAL_IN_IMG_DIM[0], constants.PARTIAL_IN_IMG_DIM[1])
+        # partialOutputMatrices = blockshaped(output_matrix, constants.PARTIAL_IN_IMG_DIM[0], constants.PARTIAL_IN_IMG_DIM[1])
+        # for i in range(len(partialInputImages)):
+        #     partialInputOutputMatrices.append((Matrix.convert(partialInputImages[i]), Matrix.convert(partialOutputMatrices[i])))
+
+    # convLayer = ConvolutionLayer(activation = constants.relu)
+    # # activLayer = NeuralLayer(constants.sigmoid)
+    # poolLayer = NeuralLayer(func = pool)
+    #
+    # layers = [convLayer, poolLayer]
+    # network = Network(layers)
     #network.train(partialInputImagesAsMatrices[0], [1, 0]) #Just try the first input image segment for now
-
 
 
 
