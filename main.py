@@ -117,9 +117,9 @@ def generateTrainTestDataSets():
     test = []
 
     for img, output_matrix in itertools.islice(inputOutputIterator, 10):
-        newImg = np.expand_dims(img, axis=0)
+        newImg = np.expand_dims(img, axis=2)
         train.append(newImg)
-        new_output_matrix = np.expand_dims(output_matrix, axis=0)
+        new_output_matrix = np.expand_dims(output_matrix, axis=2)
         test.append(new_output_matrix)
     return (train, test)
 
@@ -187,42 +187,27 @@ def main():
     # testData = npArray.transpose().swapaxes(0, 1)
     # input = Input(shape=shape)
 
-    input_img = Input(shape=(1, 480, 640))  # adapt this if using `channels_first` image data format
+    input_img = Input(shape=(480, 640, 1))  # adapt this if using `channels_first` image data format
 
-    x = Conv2D(16, (3, 3), activation='relu', padding='same', data_format='channels_first')(input_img)
+    x = Conv2D(16, (3, 3), activation='relu', padding='same', data_format='channels_last')(input_img)
     x = MaxPooling2D((2, 2), padding='same')(x)
-    x = Conv2D(8, (3, 3), activation='relu', padding='same', data_format='channels_first')(x)
+    x = Conv2D(8, (3, 3), activation='relu', padding='same', data_format='channels_last')(x)
     x = MaxPooling2D((2, 2), padding='same')(x)
-    x = Conv2D(8, (3, 3), activation='relu', padding='same', data_format='channels_first')(x)
+    x = Conv2D(8, (3, 3), activation='relu', padding='same', data_format='channels_last')(x)
     encoded = MaxPooling2D((2, 2), padding='same')(x)
 
-    x = Conv2D(8, (3, 3), activation='relu', padding='same', data_format='channels_first')(encoded)
+    x = Conv2D(8, (3, 3), activation='relu', padding='same', data_format='channels_last')(encoded)
     x = UpSampling2D((2, 2))(x)
-    x = Conv2D(8, (3, 3), activation='relu', padding='same', data_format='channels_first')(x)
+    x = Conv2D(8, (3, 3), activation='relu', padding='same', data_format='channels_last')(x)
     x = UpSampling2D((2, 2))(x)
-    x = Conv2D(16, (3, 3), activation='relu', padding='same', data_format='channels_first')(x)
+    x = Conv2D(16, (3, 3), activation='relu', padding='same', data_format='channels_last')(x)
     x = UpSampling2D((2, 2))(x)
-    decoded = Conv2D(1, (3, 3), activation='sigmoid', padding='same', data_format='channels_first')(x)
+    decoded = Conv2D(1, (3, 3), activation='sigmoid', padding='same', data_format='channels_last')(x)
     autoencoder = Model(input_img, decoded)
     autoencoder.summary()
-    autoencoder.compile(optimizer='adadelta', loss='binary_crossentropy')
-    result = autoencoder.fit(np.array(train_data), np.array(test_data), epochs=10)
-        # network = Sequential()
-    # network.add(Conv2D(32, (16, 16), activation='relu', padding='same'))
-    # network.add(UpSampling2D((2, 2)))
-    # network.add(Conv2D(32, (16, 16), activation='relu', padding='same'))
-    # network.add(UpSampling2D((2, 2)))
-    # network.add(Conv2D(64, (16, 16), activation='relu', padding='same'))
-    # network.add(UpSampling2D((2, 2)))
-    # network.add(Conv2D(1, (16, 16), activation='sigmoid', padding='same'))
-    #
-    # network.compile(loss='mean_squared_error', optimizer='adadelta')
-    # result = network.fit(np.array(x_train), np.array(x_test), epochs=10)
-
-
-    # for t in train:
-    #     image = np.expand_dims(t, axis=0)
-    #     x_train.append(model.predict(image))
+    autoencoder.compile(optimizer='adam', loss='binary_crossentropy')
+    result = autoencoder.fit(np.array(train_data), np.array(test_data), epochs=1)
+    guess = autoencoder.predict(np.expand_dims(train_data[0], axis=0))
 
 
     # inputOutputIterator = getInputAndOutputMatrices()
