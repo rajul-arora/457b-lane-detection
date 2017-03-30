@@ -1,8 +1,8 @@
 import math
 import uuid
 
-EPOCH_COUNT = 30
-TRAINING_SIZE = 30
+EPOCH_COUNT = 100
+TRAINING_SIZE = 50
 
 import cv2
 import numpy as np
@@ -41,17 +41,17 @@ def generateTrainTestDataSets():
     for img, output_matrix in itertools.islice(inputOutputIterator, TRAINING_SIZE):
         # newImg = np.expand_dims(img, axis=2)
         nImg = normalize(img)
-        train.append(nImg)
+        train.append(np.expand_dims(nImg, axis=2))
         # new_output_matrix = np.expand_dims(output_matrix, axis=2)
+        test.append(np.expand_dims(output_matrix, axis=2))
+        # m = [[[] for i in range(0, len(output_matrix[0]))] for j in range(0, len(output_matrix))]
+        # for i in range(0, len(output_matrix)):
+        #     for j in range(0, len(output_matrix[0])):
+        #         m[i][j].append(output_matrix[i][j])
+        #         m[i][j].append(output_matrix[i][j])
+        #         m[i][j].append(output_matrix[i][j])
 
-        m = [[[] for i in range(0, len(output_matrix[0]))] for j in range(0, len(output_matrix))]
-        for i in range(0, len(output_matrix)):
-            for j in range(0, len(output_matrix[0])):
-                m[i][j].append(output_matrix[i][j])
-                m[i][j].append(output_matrix[i][j])
-                m[i][j].append(output_matrix[i][j])
-
-        test.append(np.array(m))
+        # test.append(np.array(m))
     return (train, test)
 
 def getPixelMatrices(dir, file):
@@ -78,29 +78,24 @@ def blockshaped(arr, nrows, ncols):
 
 def segnet(inputImage, filename, shouldSaveWeights=True, shouldTrain=False, train_data=None, test_data=None):
     print("Entering Segnet")
-    windowSize = (8, 8)
-    dropoutRate = 0.25
-    inputShape = Input(shape=(480, 640, 3))
+    windowSize = (3, 3)
+    inputShape = Input(shape=(480, 640, 1))
+
     x = Conv2D(32, windowSize, activation='relu', padding='same')(inputShape)
-    x = Dropout(dropoutRate)(x)
     x = MaxPooling2D((2, 2), padding='same')(x)
     x = Conv2D(16, windowSize, activation='relu', padding='same')(x)
-    x = Dropout(dropoutRate)(x)
     x = MaxPooling2D((2, 2), padding='same')(x)
     x = Conv2D(8, windowSize, activation='relu', padding='same')(x)
-    x = Dropout(dropoutRate)(x)
     encoded = MaxPooling2D((2, 2), padding='same')(x)
 
     x = Conv2D(8, windowSize, activation='relu', padding='same')(encoded)
-    x = Dropout(dropoutRate)(x)
     x = UpSampling2D((2, 2))(x)
     x = Conv2D(16, windowSize, activation='relu', padding='same')(x)
-    x = Dropout(dropoutRate)(x)
     x = UpSampling2D((2, 2))(x)
     x = Conv2D(32, windowSize, activation='relu', padding='same')(x)
-    x = Dropout(dropoutRate)(x)
     x = UpSampling2D((2, 2))(x)
-    decoded = Conv2D(3, windowSize, activation='sigmoid', padding='same')(x)
+
+    decoded = Conv2D(1, windowSize, activation='sigmoid', padding='same')(x)
     autoencoder = Model(inputShape, decoded)
     autoencoder.summary()
     autoencoder.compile(optimizer='adam', loss='binary_crossentropy')
@@ -118,13 +113,6 @@ def segnet(inputImage, filename, shouldSaveWeights=True, shouldTrain=False, trai
         print("Saved Weights")
 
     guess = autoencoder.predict(np.expand_dims(inputImage, axis=0))
-
-    for matrix in guess:
-        for i in range(0, len(matrix)):
-            for j in range(0, len(matrix[0])):
-                matrix[i][j][0] = 255 - int(255.0 * matrix[i][j][0])
-                matrix[i][j][1] = 255 - int(255.0 * matrix[i][j][1])
-                matrix[i][j][2] = 255 - int(255.0 * matrix[i][j][2])
     return guess
 
 def main():
@@ -133,8 +121,20 @@ def main():
     x_test = test_data[:-1]
     verify = train_data[-1]
 
-    guess = segnet(verify, "weights.h5", shouldTrain=True, test_data=x_test, train_data=x_train)
-    cv2.imwrite('img/test-' + str(uuid.uuid4()) + '.jpg', guess[0])
+    guess = segnet(verify, "weights.h5", shouldTrain=False, test_data=x_test, train_data=x_train)
+    cvMatrix = [[[] for i in range(0, len(guess[0][0]))] for j in range(0, len(guess[0]))]
+
+    for i in range(0,len(cvMatrix)):
+        for j in range(0, len(cvMatrix[0])):
+            if guess[0][i][j] > 0.2:
+                cvMatrix[i][j].append(0)
+            else:
+                cvMatrix[i][j].append(255)
+            cvMatrix[i][j].append(255)
+            cvMatrix[i][j].append(255)
+
+
+    cv2.imwrite('img/testBlack-' + str(uuid.uuid4()) + '.jpg', np.array(cvMatrix))
 
 if __name__ == '__main__':
     main()
