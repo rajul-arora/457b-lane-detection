@@ -1,7 +1,7 @@
 import math
 import uuid
 
-EPOCH_COUNT = 100
+EPOCH_COUNT = 50
 TRAINING_SIZE = 50
 
 import cv2
@@ -95,7 +95,8 @@ def segnet(inputImage, filename, shouldSaveWeights=True, shouldTrain=False, trai
     x = Conv2D(32, windowSize, activation='relu', padding='same')(x)
     x = UpSampling2D((2, 2))(x)
 
-    decoded = Conv2D(1, windowSize, activation='sigmoid', padding='same')(x)
+    # decoded = Conv2D(1, windowSize, activation='sigmoid', padding='same')(x)
+    decoded = Conv2D(1, windowSize, activation='linear', padding='same')(x)
     autoencoder = Model(inputShape, decoded)
     autoencoder.summary()
     autoencoder.compile(optimizer='adam', loss='binary_crossentropy')
@@ -126,15 +127,20 @@ def main():
 
     for i in range(0,len(cvMatrix)):
         for j in range(0, len(cvMatrix[0])):
-            if guess[0][i][j] > 0.2:
-                cvMatrix[i][j].append(0)
-            else:
+            # cvMatrix[i][j].append(255 - int(guess[0][i][j] * 255))
+            # cvMatrix[i][j].append(255 - int(guess[0][i][j] * 255))
+            # cvMatrix[i][j].append(255 - int(guess[0][i][j] * 255))
+            if guess[0][i][j] > 0.075:
                 cvMatrix[i][j].append(255)
-            cvMatrix[i][j].append(255)
-            cvMatrix[i][j].append(255)
+                cvMatrix[i][j].append(255)
+                cvMatrix[i][j].append(255)
+            else:
+                cvMatrix[i][j].append(0)
+                cvMatrix[i][j].append(0)
+                cvMatrix[i][j].append(0)
 
 
-    cv2.imwrite('img/testBlack-' + str(uuid.uuid4()) + '.jpg', np.array(cvMatrix))
+    cv2.imwrite('img/test-' + str(uuid.uuid4()) + '.jpg', np.array(cvMatrix))
 
 if __name__ == '__main__':
     main()
