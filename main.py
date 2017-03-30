@@ -1,8 +1,9 @@
 import math
 import uuid
 
-EPOCH_COUNT = 100
-TRAINING_SIZE = 50
+EPOCH_COUNT = 50
+TRAINING_SIZE = 400
+BATCH_SEP = 0.75
 
 import cv2
 import numpy as np
@@ -21,7 +22,7 @@ from keras.applications.vgg19 import VGG19
 import itertools
 
 def getInputAndOutputMatrices():
-    dir = "./lane_images/cordova1_images/"
+    dir = "./lane_images/cordova2_images/"
     files = os.listdir(dir)
 
     for file in files:
@@ -39,19 +40,9 @@ def generateTrainTestDataSets():
     test = []
 
     for img, output_matrix in itertools.islice(inputOutputIterator, TRAINING_SIZE):
-        # newImg = np.expand_dims(img, axis=2)
         nImg = normalize(img)
         train.append(np.expand_dims(nImg, axis=2))
-        # new_output_matrix = np.expand_dims(output_matrix, axis=2)
         test.append(np.expand_dims(output_matrix, axis=2))
-        # m = [[[] for i in range(0, len(output_matrix[0]))] for j in range(0, len(output_matrix))]
-        # for i in range(0, len(output_matrix)):
-        #     for j in range(0, len(output_matrix[0])):
-        #         m[i][j].append(output_matrix[i][j])
-        #         m[i][j].append(output_matrix[i][j])
-        #         m[i][j].append(output_matrix[i][j])
-
-        # test.append(np.array(m))
     return (train, test)
 
 def getPixelMatrices(dir, file):
@@ -117,24 +108,21 @@ def segnet(inputImage, filename, shouldSaveWeights=True, shouldTrain=False, trai
 
 def main():
     (train_data, test_data) = generateTrainTestDataSets()
-    x_train = train_data[:-1]
-    x_test = test_data[:-1]
-    verify = train_data[-1]
+    x_train = train_data[:TRAINING_SIZE * BATCH_SEP]
+    x_test = test_data[:TRAINING_SIZE * BATCH_SEP]
+    verify = train_data[TRAINING_SIZE * BATCH_SEP : TRAINING_SIZE]
 
-    guess = segnet(verify, "weights.h5", shouldTrain=False, test_data=x_test, train_data=x_train)
-    cvMatrix = [[[] for i in range(0, len(guess[0][0]))] for j in range(0, len(guess[0]))]
+    guess = segnet(verify, "weights.h5", shouldTrain=True, test_data=x_test, train_data=x_train)
 
-    for i in range(0,len(cvMatrix)):
-        for j in range(0, len(cvMatrix[0])):
-            if guess[0][i][j] > 0.2:
-                cvMatrix[i][j].append(0)
-            else:
-                cvMatrix[i][j].append(255)
-            cvMatrix[i][j].append(255)
-            cvMatrix[i][j].append(255)
+    for g in guess:
+        cvMatrix = [[[] for i in range(0, len(guess[0][0]))] for j in range(0, len(guess[0]))]
+        for i in range(0,len(cvMatrix)):
+            for j in range(0, len(cvMatrix[0])):
+                cvMatrix[i][j].append(int(255 * g[i][j]))
+                cvMatrix[i][j].append(int(255 * g[i][j]))
+                cvMatrix[i][j].append(int(255 * g[i][j]))
 
-
-    cv2.imwrite('img/testBlack-' + str(uuid.uuid4()) + '.jpg', np.array(cvMatrix))
+        cv2.imwrite('img/testMono-' + str(uuid.uuid4()) + '.jpg', np.array(cvMatrix))
 
 if __name__ == '__main__':
     main()
