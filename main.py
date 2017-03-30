@@ -126,7 +126,11 @@ def segnet(inputImage, filename, shouldSaveWeights=True, shouldTrain=False, trai
 
 def main():
     (train_data, test_data) = generateTrainTestDataSets()
-    guess = segnet(train_data[0], "weights.h5", shouldTrain=True, test_data=test_data, train_data=train_data)
+    x_train = train_data[:-1]
+    x_test = test_data[:-1]
+    verify = train_data[-1]
+
+    guess = segnet(verify, "weights.h5", shouldTrain=True, test_data=x_test, train_data=x_train)
     cv2.imwrite('img/test-' + str(uuid.uuid4()) + '.jpg', guess[0])
 
 if __name__ == '__main__':
