@@ -1,8 +1,8 @@
 import math
 import uuid
 
-EPOCH_COUNT = 30
-TRAINING_SIZE = 30
+EPOCH_COUNT = 1
+TRAINING_SIZE = 2
 
 import cv2
 import numpy as np
@@ -127,7 +127,7 @@ def main():
     x_test = test_data[:-1]
     verify = train_data[-1]
 
-    guess = segnet(verify, "weights.h5", shouldTrain=False, test_data=x_test, train_data=x_train)
+    guess = segnet(verify, "weights.h5", shouldTrain=True, test_data=x_test, train_data=x_train)
 
     for matrix in guess:
         for i in range(0, len(matrix)):
