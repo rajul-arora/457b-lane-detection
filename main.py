@@ -78,8 +78,8 @@ def blockshaped(arr, nrows, ncols):
 
 def segnet(inputImage, filename, shouldSaveWeights=True, shouldTrain=False, train_data=None, test_data=None):
     print("Entering Segnet")
-    windowSize = (8, 8)
-    dropoutRate = 0.25
+    windowSize = (4, 4)
+    dropoutRate = 0.3
     inputShape = Input(shape=(480, 640, 3))
     x = Conv2D(32, windowSize, activation='relu', padding='same')(inputShape)
     x = Dropout(dropoutRate)(x)
@@ -118,6 +118,16 @@ def segnet(inputImage, filename, shouldSaveWeights=True, shouldTrain=False, trai
         print("Saved Weights")
 
     guess = autoencoder.predict(np.expand_dims(inputImage, axis=0))
+    return guess
+
+def main():
+    (train_data, test_data) = generateTrainTestDataSets()
+    
+    x_train = train_data[:-1]
+    x_test = test_data[:-1]
+    verify = train_data[-1]
+
+    guess = segnet(verify, "weights.h5", shouldTrain=False, test_data=x_test, train_data=x_train)
 
     for matrix in guess:
         for i in range(0, len(matrix)):
@@ -125,16 +135,18 @@ def segnet(inputImage, filename, shouldSaveWeights=True, shouldTrain=False, trai
                 matrix[i][j][0] = 255 - int(255.0 * matrix[i][j][0])
                 matrix[i][j][1] = 255 - int(255.0 * matrix[i][j][1])
                 matrix[i][j][2] = 255 - int(255.0 * matrix[i][j][2])
-    return guess
+                
+    id = str(uuid.uuid4())
+    cv2.imwrite('img/testWhite-' + id + '.jpg', guess[0])
 
-def main():
-    (train_data, test_data) = generateTrainTestDataSets()
-    x_train = train_data[:-1]
-    x_test = test_data[:-1]
-    verify = train_data[-1]
-
-    guess = segnet(verify, "weights.h5", shouldTrain=True, test_data=x_test, train_data=x_train)
-    cv2.imwrite('img/test-' + str(uuid.uuid4()) + '.jpg', guess[0])
+    for matrix in guess:
+        for i in range(0, len(matrix)):
+            for j in range(0, len(matrix[0])):
+                matrix[i][j][0] = 255 - matrix[i][j][0]
+                matrix[i][j][1] = 255 - matrix[i][j][1]
+                matrix[i][j][2] = 255 - matrix[i][j][2]
+                
+    cv2.imwrite('img/testBlack-' + id + '.jpg', guess[0])
 
 if __name__ == '__main__':
     main()
