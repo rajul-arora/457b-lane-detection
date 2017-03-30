@@ -10,13 +10,17 @@ public class NeuralLayer {
 
     private final List<Neuron> neurons;
 
-    public NeuralLayer(int numNeurons, Activations.Activator activator) {
+    public NeuralLayer(Activations.Activator activator, int numNeurons, int numConnectedNeurons) {
 
         this.neurons = new ArrayList<>(numNeurons);
 
         for (int i = 0; i < numNeurons; i++) {
-            this.neurons.add(new Neuron(activator));
+            this.neurons.add(new Neuron(activator, numConnectedNeurons));
         }
+    }
+
+    public int getNeuronCount() {
+        return this.neurons.size();
     }
 
     public List<Neuron> getNeurons() {

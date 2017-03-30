@@ -8,6 +8,8 @@ import java.util.concurrent.Callable;
  */
 public class Neuron {
 
+    public static final int MAX_WEIGHT_VECTOR_SIZE = 100;
+
     /**
      * Each weight is a ArrayList of Doubles which is the same size as the input ArrayLists
      */
@@ -19,10 +21,14 @@ public class Neuron {
     private ArrayList<Double> currentDelta;
     private List<ArrayList<Double>> prevInput;
 
-    public Neuron(Activations.Activator activator) {
-        this.weights = new ArrayList<>();
+    public Neuron(Activations.Activator activator, int numConnectedNeurons) {
         this.activator = activator;
         this.currentValue = null;
+        this.weights = new ArrayList<>(numConnectedNeurons);
+
+        for(int i = 0; i < numConnectedNeurons; i++) {
+            this.weights.add(this.generateWeights());
+        }
     }
 
     public List<ArrayList<Double>> getDeltaWeightProducts() {
@@ -44,16 +50,6 @@ public class Neuron {
             this.weights.set(i, VectorOperations.add(this.weights.get(i), deltaWeights));
         }
 
-    }
-
-    private ArrayList<Double> calculateDelta(List<ArrayList<Double>> deltaWeightProducts) {
-
-        // Sum up all the delta-weight products
-        ArrayList<Double> sum = VectorOperations.sum(deltaWeightProducts);
-
-        // Multiply sum with act'(currentValue)
-        ArrayList<Double> deriv = Activations.deriv(this.activator, this.currentValue);
-        return VectorOperations.product(deriv, sum);
     }
 
     /**
@@ -87,5 +83,26 @@ public class Neuron {
 
         this.currentValue = Activations.call(this.activator, output);
         return this.currentValue;
+    }
+
+    private ArrayList<Double> calculateDelta(List<ArrayList<Double>> deltaWeightProducts) {
+
+        // Sum up all the delta-weight products
+        ArrayList<Double> sum = VectorOperations.sum(deltaWeightProducts);
+
+        // Multiply sum with act'(currentValue)
+        ArrayList<Double> deriv = Activations.deriv(this.activator, this.currentValue);
+        return VectorOperations.product(deriv, sum);
+    }
+
+    private ArrayList<Double> generateWeights() {
+
+        ArrayList<Double> weightVector = new ArrayList<Double>(MAX_WEIGHT_VECTOR_SIZE);
+
+        for (int i = 0; i < MAX_WEIGHT_VECTOR_SIZE; i++) {
+            weightVector.add(Math.random());
+        }
+
+        return weightVector;
     }
 }
