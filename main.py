@@ -1,6 +1,9 @@
 import math
 import uuid
 
+EPOCH_COUNT = 30
+TRAINING_SIZE = 30
+
 import cv2
 import numpy as np
 import os
@@ -35,7 +38,7 @@ def generateTrainTestDataSets():
     train = []
     test = []
 
-    for img, output_matrix in itertools.islice(inputOutputIterator, 20):
+    for img, output_matrix in itertools.islice(inputOutputIterator, TRAINING_SIZE):
         # newImg = np.expand_dims(img, axis=2)
         nImg = normalize(img)
         train.append(nImg)
@@ -108,7 +111,7 @@ def segnet(inputImage, filename, shouldSaveWeights=True, shouldTrain=False, trai
 
     if shouldTrain and test_data is not None and train_data is not None:
         print("Training test data")
-        autoencoder.fit(np.array(train_data), np.array(test_data), epochs=1)
+        autoencoder.fit(np.array(train_data), np.array(test_data), epochs=EPOCH_COUNT)
 
     if shouldSaveWeights:
         autoencoder.save_weights(filename)
