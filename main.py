@@ -1,8 +1,8 @@
 import math
 import uuid
 
-EPOCH_COUNT = 50
-TRAINING_SIZE = 400
+EPOCH_COUNT = 1
+TRAINING_SIZE = 4
 BATCH_SEP = 0.75
 
 import cv2
@@ -108,9 +108,9 @@ def segnet(inputImage, filename, shouldSaveWeights=True, shouldTrain=False, trai
 
 def main():
     (train_data, test_data) = generateTrainTestDataSets()
-    x_train = train_data[:TRAINING_SIZE * BATCH_SEP]
-    x_test = test_data[:TRAINING_SIZE * BATCH_SEP]
-    verify = train_data[TRAINING_SIZE * BATCH_SEP : TRAINING_SIZE]
+    x_train = train_data[:int(TRAINING_SIZE * BATCH_SEP)]
+    x_test = test_data[:int(TRAINING_SIZE * BATCH_SEP)]
+    verify = train_data[int(TRAINING_SIZE * BATCH_SEP) : int(TRAINING_SIZE)]
 
     guess = segnet(verify, "weights.h5", shouldTrain=True, test_data=x_test, train_data=x_train)
 
