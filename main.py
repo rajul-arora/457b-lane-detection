@@ -1,8 +1,8 @@
 import math
 import uuid
 
-EPOCH_COUNT = 1
-TRAINING_SIZE = 4
+EPOCH_COUNT = 100
+TRAINING_SIZE = 249
 BATCH_SEP = 0.75
 
 import cv2
@@ -22,7 +22,7 @@ from keras.applications.vgg19 import VGG19
 import itertools
 
 def getInputAndOutputMatrices():
-    dir = "./lane_images/cordova2_images/"
+    dir = "./lane_images/cordova1_images/"
     files = os.listdir(dir)
 
     for file in files:
@@ -86,8 +86,8 @@ def segnet(inputImage, filename, shouldSaveWeights=True, shouldTrain=False, trai
     x = Conv2D(32, windowSize, activation='relu', padding='same')(x)
     x = UpSampling2D((2, 2))(x)
 
-    # decoded = Conv2D(1, windowSize, activation='sigmoid', padding='same')(x)
-    decoded = Conv2D(1, windowSize, activation='linear', padding='same')(x)
+    decoded = Conv2D(1, windowSize, activation='sigmoid', padding='same')(x)
+    # decoded = Conv2D(1, windowSize, activation='linear', padding='same')(x)
     autoencoder = Model(inputShape, decoded)
     autoencoder.summary()
     autoencoder.compile(optimizer='adam', loss='binary_crossentropy')
@@ -104,7 +104,8 @@ def segnet(inputImage, filename, shouldSaveWeights=True, shouldTrain=False, trai
         autoencoder.save_weights(filename)
         print("Saved Weights")
 
-    guess = autoencoder.predict(np.expand_dims(inputImage, axis=0))
+    print("\nProcess Complete")
+    guess = autoencoder.predict(np.array(inputImage))
     return guess
 
 def main():
@@ -113,7 +114,7 @@ def main():
     x_test = test_data[:int(TRAINING_SIZE * BATCH_SEP)]
     verify = train_data[int(TRAINING_SIZE * BATCH_SEP) : int(TRAINING_SIZE)]
 
-    guess = segnet(verify, "weights.h5", shouldTrain=True, test_data=x_test, train_data=x_train)
+    guess = segnet(verify, "weights-data.h5", shouldTrain=True, test_data=x_test, train_data=x_train)
 
     for g in guess:
         cvMatrix = [[[] for i in range(0, len(guess[0][0]))] for j in range(0, len(guess[0]))]
@@ -131,7 +132,9 @@ def main():
                     cvMatrix[i][j].append(0)
                     cvMatrix[i][j].append(0)
         
-        cv2.imwrite('img/testMono-' + str(uuid.uuid4()) + '.jpg', np.array(cvMatrix))
+        cv2.imwrite('img/results/testMono-' + str(uuid.uuid4()) + '.jpg', np.array(cvMatrix))
+
+    print("All Images saved")
 
 if __name__ == '__main__':
     main()
