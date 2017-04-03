@@ -1,8 +1,8 @@
 import math
 import uuid
 
-EPOCH_COUNT = 100
-TRAINING_SIZE = 249
+EPOCH_COUNT = 20
+TRAINING_SIZE = 400
 BATCH_SEP = 0.75
 
 import cv2
@@ -12,17 +12,11 @@ import sys
 from keras.models import Model
 from keras.layers import Input, Dense, Conv2D, MaxPooling2D, UpSampling2D, Dropout
 import uuid
-from keras.optimizers import SGD
-from network.Matrix import Matrix
 from network import constants
-from keras.models import Sequential
-from keras.layers import Reshape
-from keras.layers import Dense, Activation
-from keras.applications.vgg19 import VGG19
 import itertools
 
 def getInputAndOutputMatrices():
-    dir = "./lane_images/cordova1_images/"
+    dir = "./lane_images/cordova2_images/"
     files = os.listdir(dir)
 
     for file in files:
@@ -114,25 +108,21 @@ def main():
     x_test = test_data[:int(TRAINING_SIZE * BATCH_SEP)]
     verify = train_data[int(TRAINING_SIZE * BATCH_SEP) : int(TRAINING_SIZE)]
 
-    guess = segnet(verify, "weights-data.h5", shouldTrain=True, test_data=x_test, train_data=x_train)
+    print(int(TRAINING_SIZE * BATCH_SEP))
 
+    guess = segnet(verify, "8-weights-data.h5", shouldTrain=False, test_data=x_test, train_data=x_train)
+
+    ctr = 0
     for g in guess:
         cvMatrix = [[[] for i in range(0, len(guess[0][0]))] for j in range(0, len(guess[0]))]
         for i in range(0,len(cvMatrix)):
             for j in range(0, len(cvMatrix[0])):
-                # cvMatrix[i][j].append(255 - int(g[i][j] * 255))
-                # cvMatrix[i][j].append(255 - int(g[i][j] * 255))
-                # cvMatrix[i][j].append(255 - int(g[i][j] * 255))
-                if g[i][j] > 0.075:
-                    cvMatrix[i][j].append(255)
-                    cvMatrix[i][j].append(255)
-                    cvMatrix[i][j].append(255)
-                else:
-                    cvMatrix[i][j].append(0)
-                    cvMatrix[i][j].append(0)
-                    cvMatrix[i][j].append(0)
+                cvMatrix[i][j].append(int(g[i][j] * 255))
+                cvMatrix[i][j].append(int(g[i][j] * 255))
+                cvMatrix[i][j].append(int(g[i][j] * 255))
         
-        cv2.imwrite('img/results/testMono-' + str(uuid.uuid4()) + '.jpg', np.array(cvMatrix))
+        cv2.imwrite('img/results/testMono-' + str(ctr) + '.jpg', np.array(cvMatrix))
+        ctr += 1
 
     print("All Images saved")
 
